@@ -23,27 +23,43 @@ export class Preventivi {
   }
 
   // Nuova logica per il download del PDF
+  // Nuova logica multipagina per il download del PDF
   downloadPDF() {
-    // Cerchiamo l'elemento HTML che contiene l'anteprima (lo abbiamo chiamato così nel Passo 4)
     const element = document.getElementById('invoice-preview-container');
 
     if (element) {
-      // Usiamo html2canvas per fare uno "screenshot" ad alta risoluzione (scale: 2) del div
-      html2canvas(element, {scale: 2, useCORS: true}).then((canvas) => {
-        // Convertiamo il canvas in un'immagine
+      // Aggiungiamo un po' di padding per evitare che il testo tocchi i bordi del PDF
+      html2canvas(element, {scale: 2, useCORS: true, backgroundColor: '#ffffff'}).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
 
-        // Creiamo un nuovo documento PDF in formato A4 (portrait, millimetri)
+        // Creiamo il PDF in formato A4
         const pdf = new jsPDF('p', 'mm', 'a4');
 
-        // Calcoliamo le proporzioni dell'immagine per farla fittare nella pagina A4
+        // Dimensioni del foglio A4 in millimetri
         const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        const pageHeight = pdf.internal.pageSize.getHeight();
 
-        // Aggiungiamo l'immagine al PDF e lo salviamo
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        // Calcoliamo l'altezza proporzionata della nostra immagine
+        const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        // Diamo al file il nome dinamico in base al numero di preventivo
+        let heightLeft = imgHeight;
+        let position = 0; // Posizione Y da cui iniziare a stampare l'immagine
+
+        // Aggiungiamo la prima pagina
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        // Finché c'è ancora immagine da stampare, creiamo nuove pagine
+        while (heightLeft > 0) {
+          // Spostiamo la posizione Y verso l'alto (valore negativo) di una pagina esatta
+          position = heightLeft - imgHeight;
+
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        // Salvataggio del file
         const fileName = this.invoice().invoiceNumber ? `Preventivo_${this.invoice().invoiceNumber}.pdf` : 'Preventivo_Bozza.pdf';
         pdf.save(fileName);
       });

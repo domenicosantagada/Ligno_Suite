@@ -24,7 +24,8 @@
       <div class="row g-4 mb-4">
         <div class="col-md-6">
           <label class="form-label fw-bold text-secondary">Numero Preventivo</label>
-          <input (ngModelChange)="preventiviService.updateInvoice({invoiceNumber: $event})" [ngModel]="invoice().invoiceNumber" class="form-control"
+          <input (ngModelChange)="preventiviService.updateInvoice({invoiceNumber: $event})"
+                 [ngModel]="invoice().invoiceNumber" class="form-control"
                  placeholder="Es. INV-001"
                  type="text">
         </div>
@@ -40,9 +41,11 @@
         <div class="col-md-6">
           <div class="p-3 bg-light rounded">
             <h5 class="mb-3">Da (La tua Falegnameria)</h5>
-            <input (ngModelChange)="preventiviService.updateInvoice({fromName: $event})" [ngModel]="invoice().fromName" class="form-control mb-2"
+            <input (ngModelChange)="preventiviService.updateInvoice({fromName: $event})" [ngModel]="invoice().fromName"
+                   class="form-control mb-2"
                    placeholder="Nome Falegnameria / Azienda" type="text">
-            <input (ngModelChange)="preventiviService.updateInvoice({fromEmail: $event})" [ngModel]="invoice().fromEmail" class="form-control"
+            <input (ngModelChange)="preventiviService.updateInvoice({fromEmail: $event})"
+                   [ngModel]="invoice().fromEmail" class="form-control"
                    placeholder="Indirizzo Email"
                    type="email">
           </div>
@@ -50,9 +53,11 @@
         <div class="col-md-6">
           <div class="p-3 bg-light rounded">
             <h5 class="mb-3">A (Cliente)</h5>
-            <input (ngModelChange)="preventiviService.updateInvoice({toName: $event})" [ngModel]="invoice().toName" class="form-control mb-2"
+            <input (ngModelChange)="preventiviService.updateInvoice({toName: $event})" [ngModel]="invoice().toName"
+                   class="form-control mb-2"
                    placeholder="Nome / Azienda Cliente" type="text">
-            <input (ngModelChange)="preventiviService.updateInvoice({toEmail: $event})" [ngModel]="invoice().toEmail" class="form-control"
+            <input (ngModelChange)="preventiviService.updateInvoice({toEmail: $event})" [ngModel]="invoice().toEmail"
+                   class="form-control"
                    placeholder="Indirizzo Email" type="email">
           </div>
         </div>
@@ -74,17 +79,23 @@
             @for (item of invoice().items; track item.id; let i = $index) {
               <tr class="border-bottom">
                 <td>
-                  <input (ngModelChange)="preventiviService.updateItem(i, 'description', $event)" [ngModel]="item.description" class="form-control"
-                         placeholder="Es. Realizzazione tavolo in rovere"
-                         type="text">
+                  <textarea
+                    (ngModelChange)="preventiviService.updateItem(i, 'description', $event)"
+                    [ngModel]="item.description"
+                    class="form-control"
+                    placeholder="Descrizione"
+                    rows="1">
+                  </textarea>
                 </td>
                 <td>
-                  <input (ngModelChange)="preventiviService.updateItem(i, 'quantity', $event)" [ngModel]="item.quantity" class="form-control"
+                  <input (ngModelChange)="preventiviService.updateItem(i, 'quantity', $event)" [ngModel]="item.quantity"
+                         class="form-control"
                          min="1"
                          type="number">
                 </td>
                 <td>
-                  <input (ngModelChange)="preventiviService.updateItem(i, 'rate', $event)" [ngModel]="item.rate" class="form-control" min="0"
+                  <input (ngModelChange)="preventiviService.updateItem(i, 'rate', $event)" [ngModel]="item.rate"
+                         class="form-control" min="0"
                          step="0.01" type="number">
                 </td>
                 <td class="text-end fw-bold text-secondary">
@@ -116,7 +127,8 @@
 
             <div class="d-flex justify-content-between align-items-center mb-2">
               <span class="text-muted">Aliquota IVA (%):</span>
-              <input (ngModelChange)="preventiviService.updateInvoice({taxRate: $event})" [ngModel]="invoice().taxRate" class="form-control form-control-sm w-25 text-end" max="100"
+              <input (ngModelChange)="preventiviService.updateInvoice({taxRate: $event})" [ngModel]="invoice().taxRate"
+                     class="form-control form-control-sm w-25 text-end" max="100"
                      min="0" type="number">
             </div>
 
@@ -165,18 +177,20 @@
         <thead class="table-light border-top border-bottom">
         <tr>
           <th class="py-3">Descrizione</th>
-          <th class="py-3 text-center">Q.tà</th>
-          <th class="py-3 text-end">Prezzo Unit.</th>
-          <th class="py-3 text-end">Importo</th>
+
+          <th class="py-3 text-center text-nowrap" style="width: 1%;">Q.tà</th>
+          <th class="py-3 text-end text-nowrap" style="width: 1%;">Prezzo Unit.</th>
+          <th class="py-3 text-end text-nowrap" style="width: 1%;">Importo</th>
         </tr>
         </thead>
         <tbody class="border-bottom-0">
           @for (item of invoice().items; track item.id) {
             <tr>
-              <td class="py-3">{{ item.description || '-' }}</td>
-              <td class="py-3 text-center">{{ item.quantity }}</td>
-              <td class="py-3 text-end">€ {{ item.rate | number:'1.2-2' }}</td>
-              <td class="py-3 text-end fw-bold">€ {{ item.amount | number:'1.2-2' }}</td>
+              <td class="py-3" style="white-space: pre-wrap; word-break: break-word;">{{ item.description || '-' }}</td>
+
+              <td class="py-3 text-center text-nowrap">{{ item.quantity }}</td>
+              <td class="py-3 text-end text-nowrap">€ {{ item.rate | number:'1.2-2' }}</td>
+              <td class="py-3 text-end fw-bold text-nowrap">€ {{ item.amount | number:'1.2-2' }}</td>
             </tr>
           }
         </tbody>
