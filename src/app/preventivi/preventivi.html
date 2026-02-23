@@ -185,9 +185,9 @@
         </thead>
         <tbody class="border-bottom-0">
           @for (item of invoice().items; track item.id) {
-            <tr>
-              <td class="py-3" style="white-space: pre-wrap; word-break: break-word;">{{ item.description || '-' }}</td>
+            <tr style="page-break-inside: avoid; break-inside: avoid;">
 
+              <td class="py-3" style="white-space: pre-wrap; word-break: break-word;">{{ item.description || '-' }}</td>
               <td class="py-3 text-center text-nowrap">{{ item.quantity }}</td>
               <td class="py-3 text-end text-nowrap">€ {{ item.rate | number:'1.2-2' }}</td>
               <td class="py-3 text-end fw-bold text-nowrap">€ {{ item.amount | number:'1.2-2' }}</td>
