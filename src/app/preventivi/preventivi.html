@@ -45,7 +45,8 @@
       <div class="row g-4 mb-4">
         <div class="col-md-6">
           <div class="p-3 bg-light rounded">
-            <h5 class="mb-3">Da (La tua Falegnameria)</h5>
+            <h5 class="mb-3">Emittente
+            </h5>
             <input (ngModelChange)="preventiviService.updateInvoice({fromName: $event})" [ngModel]="invoice().fromName"
                    class="form-control mb-2"
                    placeholder="Nome Falegnameria / Azienda" type="text">
@@ -57,7 +58,7 @@
         </div>
         <div class="col-md-6">
           <div class="p-3 bg-light rounded">
-            <h5 class="mb-3">A (Cliente)</h5>
+            <h5 class="mb-3">Cliente</h5>
             <input (ngModelChange)="preventiviService.updateInvoice({toName: $event})" [ngModel]="invoice().toName"
                    class="form-control mb-2"
                    placeholder="Nome / Azienda Cliente" type="text">
