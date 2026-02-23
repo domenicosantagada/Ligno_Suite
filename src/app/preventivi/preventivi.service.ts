@@ -93,31 +93,66 @@ export class PreventiviService {
     this.updateInvoice({items: newItems});
   }
 
-  // 4. MODIFICA il metodo di salvataggio
   salvaPreventivoNelDb() {
-    // Cloniamo i dati prima di inviarli
-    const preventivoDaSalvare = JSON.parse(JSON.stringify(this.invoice()));
+    const data = this.invoice();
 
-    // LA MAGIA: Se il numero preventivo è stato cambiato dall'utente,
-    // significa che sta facendo un "Salva con nome" (nuovo preventivo).
-    // Rigeneriamo gli ID delle righe per non far arrabbiare il database!
+    // 1. CONTROLLO CAMPI VUOTI (Sicurezza)
+    if (!data.invoiceNumber || data.invoiceNumber.trim() === '') {
+      alert('Errore: Inserire un numero di preventivo.');
+      return;
+    }
+    if (!data.toName || data.toName.trim() === '') {
+      alert('Errore: Inserire il nome del cliente.');
+      return;
+    }
+
+    const preventivoDaSalvare = JSON.parse(JSON.stringify(data));
+
+    // 2. CAPIAMO L'INTENZIONE DELL'UTENTE
+    // È un aggiornamento SOLO se l'utente aveva aperto un preventivo esistente
+    // e NON ha cambiato il suo numero.
+    const isUpdate = this.originalInvoiceNumber && (this.originalInvoiceNumber === preventivoDaSalvare.invoiceNumber);
+
+    // 3. LOGICA "SALVA CON NOME"
+    // Se ha cambiato numero, rigeneriamo gli ID delle righe per evitare conflitti nel DB
     if (this.originalInvoiceNumber && this.originalInvoiceNumber !== preventivoDaSalvare.invoiceNumber) {
       preventivoDaSalvare.items.forEach((item: any, index: number) => {
         item.id = Date.now().toString() + '-' + index;
       });
     }
 
-    this.http.post<InvoiceData>(this.apiUrl, preventivoDaSalvare).subscribe({
-      next: (response) => {
-        alert('Preventivo salvato con successo nel database!');
-        // Ora il nuovo numero diventa l'originale
-        this.originalInvoiceNumber = preventivoDaSalvare.invoiceNumber;
-      },
-      error: (err) => {
-        alert('Errore durante il salvataggio');
-        console.error(err);
-      }
-    });
+    // 4. ESEGUIAMO LA CHIAMATA CORRETTA AL SERVER
+    if (isUpdate) {
+      // ---> MODALITÀ MODIFICA (Usa PUT)
+      this.http.put<InvoiceData>(`${this.apiUrl}/${preventivoDaSalvare.invoiceNumber}`, preventivoDaSalvare).subscribe({
+        next: () => {
+          alert('Preventivo aggiornato con successo!');
+        },
+        error: (err) => {
+          alert('Errore durante l\'aggiornamento: ' + (err.error?.message || 'Errore generico'));
+          console.error(err);
+        }
+      });
+
+    } else {
+      // ---> MODALITÀ CREAZIONE O "SALVA CON NOME" (Usa POST)
+      this.http.post<InvoiceData>(this.apiUrl, preventivoDaSalvare).subscribe({
+        next: () => {
+          alert('Nuovo preventivo salvato con successo!');
+          // Ora il nuovo numero diventa l'originale
+          this.originalInvoiceNumber = preventivoDaSalvare.invoiceNumber;
+        },
+        error: (err) => {
+          // Gestione dell'errore "Duplicato" (409 Conflict dal backend)
+          if (err.status === 409) {
+            alert('Errore: Il numero preventivo "' + preventivoDaSalvare.invoiceNumber + '" è già utilizzato.');
+          } else {
+            alert('Errore durante il salvataggio: ' + (err.error?.message || 'Errore generico'));
+          }
+          console.error(err);
+        }
+      });
+    }
   }
 
   // Aggiungi questo NUOVO metodo per leggere dal DB
