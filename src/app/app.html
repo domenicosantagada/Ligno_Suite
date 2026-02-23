@@ -1,33 +1,34 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light custom-navbar">
   <div class="container-fluid">
-
 
     <a [routerLink]="['/']" class="navbar-brand">
       <img alt="Logo" class="d-inline-block align-text-top" height="70" src="image/logo.svg">
     </a>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav mb-2 mb-lg-0 mx-auto">
         <li class="nav-item">
-          <a [routerLink]="['/preventivi']" class="nav-link">Preventivi</a>
+          <a [routerLink]="['/preventivi']" class="nav-link custom-link">Preventivi</a>
         </li>
 
         <li class="nav-item">
-          <a [routerLink]="['/taglio-pannelli']" class="nav-link">Taglio Pannelli</a>
+          <a [routerLink]="['/taglio-pannelli']" class="nav-link custom-link">Taglio Pannelli</a>
         </li>
 
         <li class="nav-item">
-          <a [routerLink]="['/prezzario']" class="nav-link">Prezzario</a>
+          <a [routerLink]="['/prezzario']" class="nav-link custom-link">Prezzario</a>
         </li>
-
       </ul>
+
       <form class="d-flex">
-        <button class="btn btn-outline-success" type="submit">Esci</button>
+        <button class="btn btn-outline-dark btn-sm px-4 rounded-pill" type="submit">Esci</button>
       </form>
     </div>
+
+
   </div>
 </nav>
 
-<div class="container">
+<div class="container mt-4">
   <router-outlet></router-outlet>
 </div>

@@ -5,7 +5,7 @@ import {Prezzario} from './prezzario/prezzario';
 import {Home} from './home/home';
 
 export const routes: Routes = [
-  {path: "", redirectTo: "/preventivi", pathMatch: "full"},
+  {path: "", redirectTo: "/home", pathMatch: "full"},
   {path: "home", component: Home},
   {path: "preventivi", component: Preventivi},
   {path: "taglio-pannelli", component: TaglioPannelli},
