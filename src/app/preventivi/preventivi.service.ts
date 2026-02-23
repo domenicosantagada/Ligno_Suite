@@ -119,6 +119,23 @@ export class PreventiviService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
+  // Aggiungi questo metodo per svuotare il form quando si crea un nuovo preventivo
+  resetInvoice() {
+    this.invoice.set({
+      invoiceNumber: '',
+      date: new Date().toISOString().split('T')[0],
+      fromName: '',
+      fromEmail: '',
+      toName: '',
+      toEmail: '',
+      items: [{id: Date.now().toString(), description: '', quantity: 1, rate: 0, amount: 0}],
+      taxRate: 22,
+      subtotal: 0,
+      taxAmount: 0,
+      total: 0
+    });
+  }
+
   // Logica traslata fedelmente da utils/calculations.ts
   private calculateTotals(items: InvoiceItem[], taxRate: number | string) {
     const subtotal = items.reduce((sum, item) => {

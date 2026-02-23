@@ -2,27 +2,23 @@ import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {InvoiceData} from '../preventivi/preventivi.model';
-import {RouterLink} from '@angular/router';
-import {PreventiviService} from '../preventivi/preventivi.service'; // Importa il service
+import {Router} from '@angular/router'; // <-- Aggiunto Router
+import {PreventiviService} from '../preventivi/preventivi.service';
 
 @Component({
   selector: 'app-lista-preventivi',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './lista-preventivi.html',
   styleUrl: './lista-preventivi.css',
 })
 export class ListaPreventivi implements OnInit {
-  // Inietta il servizio che comunica con Spring Boot
   preventiviService = inject(PreventiviService);
+  router = inject(Router); // <-- Inietta il Router per navigare via codice
 
-  // Il signal parte con un array vuoto invece che con i dati di esempio
   preventivi = signal<InvoiceData[]>([]);
-
-  // Segnale per il termine di ricerca
   searchTerm = signal('');
 
-  // Computed per filtrare dinamicamente la lista (rimane uguale)
   filteredPreventivi = computed(() => {
     const term = this.searchTerm().toLowerCase();
     return this.preventivi().filter(p =>
@@ -31,44 +27,46 @@ export class ListaPreventivi implements OnInit {
     );
   });
 
-  // ngOnInit scatta in automatico appena apri la pagina "Archivio Preventivi"
   ngOnInit() {
     this.caricaPreventiviDalDb();
   }
 
-  // Metodo che chiama il backend e aggiorna la tabella
   caricaPreventiviDalDb() {
     this.preventiviService.getTuttiIPreventivi().subscribe({
-      next: (dati) => {
-        // Quando Spring Boot risponde, inseriamo i dati nel signal
-        this.preventivi.set(dati);
-      },
-      error: (err) => {
-        console.error('Errore durante il recupero dei preventivi:', err);
-      }
+      next: (dati) => this.preventivi.set(dati),
+      error: (err) => console.error('Errore durante il recupero dei preventivi:', err)
     });
   }
-  
 
-  // Metodo per eliminare in modo definitivo dal database
+  // --- NUOVI METODI ---
+
+  creaNuovo() {
+    this.preventiviService.resetInvoice(); // Svuota i dati vecchi
+    this.router.navigate(['/preventivi']); // Vai alla pagina di creazione
+  }
+
+  visualizzaPreventivo(prev: InvoiceData) {
+    this.preventiviService.invoice.set(prev); // Carica i dati nel service
+    // Naviga alla pagina ma aggiunge ?preview=true nell'URL
+    this.router.navigate(['/preventivi'], {queryParams: {preview: 'true'}});
+  }
+
+  modificaPreventivo(prev: InvoiceData) {
+    this.preventiviService.invoice.set(prev); // Carica i dati nel service
+    this.router.navigate(['/preventivi']); // Naviga in modalità form (modifica)
+  }
+
+  // --- FINE NUOVI METODI ---
+
   eliminaPreventivo(numero: string) {
-    if (!numero) return; // Controllo di sicurezza
-
-    if (confirm(`Sei sicuro di voler eliminare definitivamente il preventivo ${numero}?`)) {
-
-      // Chiamata al backend per eliminare dal DB
+    if (!numero) return;
+    if (confirm(`Sei sicuro di voler eliminare il preventivo ${numero}?`)) {
       this.preventiviService.eliminaPreventivoDalDb(numero).subscribe({
         next: () => {
-          // Se il backend risponde con successo, lo togliamo anche dalla schermata
           this.preventivi.update(list => list.filter(p => p.invoiceNumber !== numero));
-          alert(`Preventivo ${numero} eliminato con successo!`);
         },
-        error: (err) => {
-          console.error('Errore durante l\'eliminazione:', err);
-          alert('Si è verificato un errore durante l\'eliminazione dal database.');
-        }
+        error: (err) => console.error('Errore durante l\'eliminazione:', err)
       });
-
     }
   }
 }
