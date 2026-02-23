@@ -1,11 +1,18 @@
 // src/app/preventivi/preventivi.service.ts
-import {Injectable, signal} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {InvoiceData, InvoiceItem} from './preventivi.model';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class PreventiviService {
+
+
+  private http = inject(HttpClient); // Inietta il client HTTP
+  private apiUrl = 'http://localhost:8080/api/preventivi'; // L'URL di Spring Boot
+
 
   // Dati iniziali di default
   private initialData: InvoiceData = {
@@ -83,6 +90,33 @@ export class PreventiviService {
     }
 
     this.updateInvoice({items: newItems});
+  }
+
+  // Aggiungi questo NUOVO metodo per salvare su DB
+  salvaPreventivoNelDb() {
+    const preventivoDaSalvare = this.invoice();
+
+    // Effettua la chiamata POST a Spring Boot
+    this.http.post<InvoiceData>(this.apiUrl, preventivoDaSalvare).subscribe({
+      next: (response) => {
+        alert('Preventivo salvato con successo nel database!');
+        console.log('Salvato:', response);
+      },
+      error: (err) => {
+        alert('Errore durante il salvataggio');
+        console.error(err);
+      }
+    });
+  }
+
+  // Aggiungi questo NUOVO metodo per leggere dal DB
+  getTuttiIPreventivi() {
+    return this.http.get<InvoiceData[]>(this.apiUrl);
+  }
+
+  // Metodo per ELIMINARE dal DB
+  eliminaPreventivoDalDb(id: string) {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
   // Logica traslata fedelmente da utils/calculations.ts

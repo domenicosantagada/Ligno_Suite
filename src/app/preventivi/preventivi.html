@@ -11,8 +11,11 @@
           <i class="bi bi-download"></i> Scarica PDF
         </button>
       } @else {
-        <button (click)="togglePreview()" class="btn btn-primary">
+        <button (click)="togglePreview()" class="btn btn-outline-secondary me-2">
           <i class="bi bi-eye"></i> Vedi Anteprima
+        </button>
+        <button (click)="preventiviService.salvaPreventivoNelDb()" class="btn btn-primary">
+          <i class="bi bi-save"></i> Salva
         </button>
       }
     </div>
