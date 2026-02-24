@@ -4,11 +4,13 @@ import {TaglioPannelli} from './taglio-pannelli/taglio-pannelli';
 import {Prezzario} from './prezzario/prezzario';
 import {Home} from './home/home';
 import {ListaPreventivi} from './lista-preventivi/lista-preventivi';
-import {Login} from './login/login'; // 1. Importa il componente Login
+import {Login} from './login/login';
+import {Register} from './register/register'; // 1. Importa il componente Login
 
 export const routes: Routes = [
   {path: "", redirectTo: "/login", pathMatch: "full"}, // 2. Modifica il redirect iniziale su /login
   {path: "login", component: Login}, // 3. Aggiungi la rotta di login
+  {path: "register", component: Register}, // Aggiungi la rotta
   {path: "home", component: Home},
   {path: "lista-preventivi", component: ListaPreventivi},
   {path: "preventivi", component: Preventivi},

@@ -1,0 +1,41 @@
+<div class="login-wrapper">
+  <div class="card shadow-sm border-0 rounded-4 login-card">
+    <div class="card-body p-5">
+      <div class="text-center mb-4">
+        <h4 class="fw-bold text-dark">Crea un Account</h4>
+      </div>
+
+      @if (errore) {
+        <div class="alert alert-danger py-2 small">{{ errore }}</div>
+      }
+
+      <form (ngSubmit)="onSubmit()" [formGroup]="registerForm">
+        <div class="mb-3">
+          <label class="form-label text-muted small fw-bold">Nome / Azienda</label>
+          <input class="form-control form-control-lg bg-light border-0" formControlName="nome" placeholder="Il tuo nome"
+                 type="text">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small fw-bold">Email</label>
+          <input class="form-control form-control-lg bg-light border-0" formControlName="email" placeholder="Inserisci la tua email"
+                 type="email">
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label text-muted small fw-bold">Password</label>
+          <input class="form-control form-control-lg bg-light border-0" formControlName="password" placeholder="Scegli una password"
+                 type="password">
+        </div>
+
+        <button [disabled]="registerForm.invalid" class="btn btn-dark btn-lg w-100 rounded-pill mb-3" type="submit">
+          Registrati
+        </button>
+
+        <div class="text-center small">
+          Hai già un account? <a class="text-dark fw-bold text-decoration-none" routerLink="/login">Accedi qui</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

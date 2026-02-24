@@ -1,4 +1,4 @@
-@if (router.url !== '/login') {
+@if (router.url !== '/login' && router.url !== '/register') {
   <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
     <div class="container-fluid position-relative">
 
@@ -35,6 +35,7 @@
   </nav>
 }
 
-<div [class.container]="router.url !== '/login'" [class.mt-4]="router.url !== '/login'">
+<div [class.container]="router.url !== '/login' && router.url !== '/register'"
+     [class.mt-4]="router.url !== '/login' && router.url !== '/register'">
   <router-outlet></router-outlet>
 </div>

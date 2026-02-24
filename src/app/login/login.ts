@@ -1,28 +1,38 @@
 import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
+import {Auth} from '../auth/auth'; // Aggiungi RouterLink
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink], // Aggiungi RouterLink
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
 export class Login {
+  errore = '';
   private fb = inject(FormBuilder);
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
   private router = inject(Router);
+  private authService = inject(Auth); // Inietta il servizio
 
   onSubmit() {
     if (this.loginForm.valid) {
-      console.log('Dati di login:', this.loginForm.value);
-      // Quando il login ha successo, naviga alla home
-      this.router.navigate(['/home']);
+      this.authService.login(this.loginForm.value).subscribe({
+        // AGGIUNGI ": any" QUI SOTTO
+        next: (utente: any) => {
+          console.log('Benvenuto', utente.nome);
+          this.router.navigate(['/home']);
+        },
+        error: () => {
+          this.errore = 'Email o password errati.';
+        }
+      });
     }
   }
 }

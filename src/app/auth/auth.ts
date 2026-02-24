@@ -1,0 +1,18 @@
+import {inject, Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class Auth {
+  private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:8080/api/auth';
+
+  login(dati: any) {
+    return this.http.post(`${this.apiUrl}/login`, dati);
+  }
+
+  register(dati: any) {
+    return this.http.post(`${this.apiUrl}/register`, dati);
+  }
+}
