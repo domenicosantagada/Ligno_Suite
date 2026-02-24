@@ -22,7 +22,14 @@ export const routes: Routes = [
   {path: "register", component: Register}, // Aggiungi la rotta
   {path: "home", component: Home},
   {path: "lista-preventivi", component: ListaPreventivi},
-  {path: "preventivi", component: Preventivi},
+
+  {
+    path: "preventivi",
+    component: Preventivi,
+    canDeactivate: [(component: Preventivi) => component.puoAbbandonarePagina()]
+  },
+
+
   {path: "taglio-pannelli", component: TaglioPannelli},
   {path: "prezzario", component: Prezzario},
   {path: "rubrica", component: Rubrica},

@@ -80,6 +80,35 @@ export class Preventivi implements OnInit {
     this.isPreview.update(v => !v);
   }
 
+  // Metodo richiamato in automatico dal Guard quando cerchi di cambiare pagina
+  puoAbbandonarePagina(): boolean {
+    const inv = this.invoice();
+
+    // Controlliamo se c'è almeno un dato inserito (per non disturbare l'utente se la pagina è già vuota)
+    const haDati = inv.invoiceNumber !== '' ||
+      inv.toName !== '' ||
+      inv.fromName !== '' ||
+      (inv.items.length > 0 && inv.items[0].description !== '');
+
+    // Se il documento è completamente vuoto, lo lasciamo uscire subito svuotando per sicurezza
+    if (!haDati) {
+      this.preventiviService.resetInvoice();
+      return true;
+    }
+
+    // Se c'è qualcosa di scritto, mostriamo il messaggio di avviso
+    const conferma = confirm('Sei sicuro di voler lasciare la pagina? I dati non salvati andranno persi.');
+
+    if (conferma) {
+      // Se sceglie "Sì", puliamo tutto. Così al prossimo accesso il documento è di nuovo vuoto!
+      this.preventiviService.resetInvoice();
+      return true; // Permette la navigazione
+    } else {
+      // Se sceglie "No", blocchiamo il cambio pagina e lo lasciamo lì dov'è
+      return false;
+    }
+  }
+
   downloadPDF() {
     const element = document.getElementById('invoice-preview-container');
 
