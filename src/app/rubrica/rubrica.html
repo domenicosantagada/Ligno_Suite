@@ -1,69 +1,115 @@
 <div class="container-fluid py-4">
-  <div class="d-flex justify-content-between align-items-center mb-5">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">Rubrica Clienti</h2>
-    <button (click)="creaNuovo()" class="btn btn-dark btn-sm px-4 rounded-pill">
-      Nuovo Cliente
-    </button>
+    <div>
+      @if (mostraForm()) {
+        <button (click)="annulla()" class="btn btn-outline-secondary btn-sm px-4 rounded-pill me-2">
+          Annulla
+        </button>
+        <button (click)="salvaCliente()" class="btn btn-success btn-sm px-4 rounded-pill">
+          <i class="bi bi-floppy"></i> Salva
+        </button>
+      } @else {
+        <button (click)="creaNuovo()" class="btn btn-dark btn-sm px-4 rounded-pill">
+          Nuovo Cliente
+        </button>
+      }
+    </div>
   </div>
 
-  <div class="card shadow-sm border-0 bg-white rounded-4 overflow-hidden">
+  @if (!mostraForm()) {
 
-    <div class="px-4 pt-4 mb-3">
-      <div class="input-group input-group-sm" style="max-width: 300px;">
-        <span class="input-group-text bg-white border-end-0 text-muted">
-          <i class="bi bi-search"></i>
-        </span>
-        <input (ngModelChange)="searchTerm.set($event)"
-               [ngModel]="searchTerm()"
-               class="form-control border-start-0 ps-0 shadow-none"
-               placeholder="Cerca cliente..."
-               type="text">
+    <div class="card shadow-sm border-0 bg-white rounded-4 overflow-hidden">
+      <div class="px-4 pt-4 mb-3">
+        <div class="input-group input-group-sm" style="max-width: 300px;">
+          <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+          <input (ngModelChange)="searchTerm.set($event)" [ngModel]="searchTerm()"
+                 class="form-control border-start-0 ps-0 shadow-none" placeholder="Cerca cliente..."
+                 type="text">
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="bg-light">
+          <tr>
+            <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">Ragione Sociale</th>
+            <th class="py-3 text-uppercase small fw-bold text-muted">Email</th>
+            <th class="py-3 text-uppercase small fw-bold text-muted">Telefono</th>
+            <th class="py-3 text-uppercase small fw-bold text-muted">P.IVA / C.F.</th>
+            <th class="pe-4 py-3 text-uppercase small fw-bold text-muted text-center">Azioni</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (cliente of filteredClienti(); track cliente.id) {
+              <tr class="hover-row">
+                <td class="ps-4 py-3 fw-semibold text-dark">{{ cliente.nome }}</td>
+                <td class="py-3 text-muted small">{{ cliente.email || '---' }}</td>
+                <td class="py-3 text-muted small">{{ cliente.telefono || '---' }}</td>
+                <td class="py-3 font-monospace text-secondary small">{{ cliente.partitaIva || '---' }}</td>
+                <td class="pe-4 py-3 text-center">
+                  <div class="d-flex justify-content-center gap-3">
+                    <button (click)="modificaCliente(cliente)" class="action-icon" title="Modifica">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button (click)="eliminaCliente(cliente.id)" class="action-icon text-danger-hover" title="Elimina">
+                      <i class="bi bi-trash3"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td class="text-center py-5 text-muted" colspan="5">Nessun cliente in rubrica.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <div class="table-responsive">
-      <table class="table align-middle mb-0">
-        <thead class="bg-light">
-        <tr>
-          <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="letter-spacing: 1px;">Ragione Sociale
-          </th>
-          <th class="py-3 text-uppercase small fw-bold text-muted" style="letter-spacing: 1px;">Email</th>
-          <th class="py-3 text-uppercase small fw-bold text-muted" style="letter-spacing: 1px;">Telefono</th>
-          <th class="py-3 text-uppercase small fw-bold text-muted" style="letter-spacing: 1px;">P.IVA / C.F.</th>
-          <th class="pe-4 py-3 text-uppercase small fw-bold text-muted text-center" style="letter-spacing: 1px;">
-            Azioni
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-          @for (cliente of filteredClienti(); track cliente.id) {
-            <tr class="hover-row">
-              <td class="ps-4 py-3 fw-semibold text-dark">{{ cliente.nome }}</td>
-              <td class="py-3 text-muted small">{{ cliente.email || '---' }}</td>
-              <td class="py-3 text-muted small">{{ cliente.telefono || '---' }}</td>
-              <td class="py-3 font-monospace text-secondary small">{{ cliente.partitaIva || '---' }}</td>
+  } @else {
 
-              <td class="pe-4 py-3 text-center">
-                <div class="d-flex justify-content-center gap-3">
-                  <button (click)="modificaCliente(cliente)" class="action-icon" title="Modifica">
-                    <i class="bi bi-pencil-square"></i>
-                  </button>
+    <div class="card p-4 shadow-sm border-0 bg-white rounded-4 mx-auto" style="max-width: 800px;">
+      <h5 class="mb-4 border-bottom pb-3 text-dark fw-bold">
+        {{ clienteCorrente().id === '' ? 'Aggiungi Nuovo Cliente' : 'Modifica Dati Cliente' }}
+      </h5>
 
-                  <button (click)="eliminaCliente(cliente.id)" class="action-icon text-danger-hover" title="Elimina">
-                    <i class="bi bi-trash3"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td class="text-center py-5 text-muted" colspan="5">
-                Nessun cliente trovato.
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+      <div class="row g-4 mb-2">
+        <div class="col-12">
+          <label class="form-label text-muted small fw-bold">Ragione Sociale / Nome *</label>
+          <input (ngModelChange)="aggiornaCampoForm('nome', $event)" [ngModel]="clienteCorrente().nome"
+                 class="form-control  bg-light border-0"
+                 placeholder="Es. Mario Rossi S.r.l."
+                 type="text">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label text-muted small fw-bold">Indirizzo Email</label>
+          <input (ngModelChange)="aggiornaCampoForm('email', $event)" [ngModel]="clienteCorrente().email"
+                 class="form-control  bg-light border-0"
+                 placeholder="Es. info@azienda.it"
+                 type="email">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label text-muted small fw-bold">Telefono</label>
+          <input (ngModelChange)="aggiornaCampoForm('telefono', $event)" [ngModel]="clienteCorrente().telefono"
+                 class="form-control  bg-light border-0"
+                 placeholder="Es. 02 1234567"
+                 type="text">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label text-muted small fw-bold">Partita IVA / C.F.</label>
+          <input (ngModelChange)="aggiornaCampoForm('partitaIva', $event)" [ngModel]="clienteCorrente().partitaIva"
+                 class="form-control  bg-light border-0"
+                 placeholder="Es. IT12345678901"
+                 type="text">
+        </div>
+      </div>
     </div>
-  </div>
+
+  }
 </div>

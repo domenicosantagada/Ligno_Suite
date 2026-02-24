@@ -2,7 +2,6 @@ import {Component, computed, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 
-// Definiamo la struttura di un Cliente
 export interface Cliente {
   id: string;
   nome: string;
@@ -14,13 +13,12 @@ export interface Cliente {
 @Component({
   selector: 'app-rubrica',
   standalone: true,
-  imports: [CommonModule, FormsModule], // Importiamo FormsModule per la barra di ricerca
+  imports: [CommonModule, FormsModule],
   templateUrl: './rubrica.html',
   styleUrl: './rubrica.css',
 })
 export class Rubrica {
 
-  // Dati finti di prova (successivamente li caricheremo dal DB come i preventivi)
   clienti = signal<Cliente[]>([
     {
       id: '1',
@@ -40,7 +38,9 @@ export class Rubrica {
 
   searchTerm = signal('');
 
-  // Filtra la tabella in tempo reale in base a nome o email
+  // --- NUOVE VARIABILI PER IL FORM ---
+  mostraForm = signal(false); // Controlla se mostrare la tabella o il form
+  clienteCorrente = signal<Cliente>({id: '', nome: '', email: '', telefono: '', partitaIva: ''});
   filteredClienti = computed(() => {
     const term = this.searchTerm().toLowerCase();
     return this.clienti().filter(c =>
@@ -49,18 +49,53 @@ export class Rubrica {
     );
   });
 
-  // Azioni dei pulsanti
+  // AGGIUNGI QUESTO METODO:
+  aggiornaCampoForm(campo: keyof Cliente, valore: string) {
+    this.clienteCorrente.update(c => ({...c, [campo]: valore}));
+  }
+
+  // --- NUOVA LOGICA DEI PULSANTI ---
+
   creaNuovo() {
-    alert('Presto aprirò una schermata per inserire un nuovo cliente!');
+    // Svuota il form e lo mostra
+    this.clienteCorrente.set({id: '', nome: '', email: '', telefono: '', partitaIva: ''});
+    this.mostraForm.set(true);
   }
 
   modificaCliente(cliente: Cliente) {
-    alert(`Presto aprirò la schermata per modificare: ${cliente.nome}`);
+    // Copia i dati del cliente nel form e lo mostra
+    this.clienteCorrente.set({...cliente});
+    this.mostraForm.set(true);
+  }
+
+  annulla() {
+    // Chiude il form senza salvare
+    this.mostraForm.set(false);
+  }
+
+  salvaCliente() {
+    const dati = this.clienteCorrente();
+
+    if (!dati.nome || dati.nome.trim() === '') {
+      alert('Inserisci almeno la Ragione Sociale / Nome.');
+      return;
+    }
+
+    if (dati.id === '') {
+      // È un NUOVO cliente (generiamo un ID finto provvisorio)
+      dati.id = Date.now().toString();
+      this.clienti.update(list => [...list, dati]);
+    } else {
+      // È una MODIFICA di un cliente esistente
+      this.clienti.update(list => list.map(c => c.id === dati.id ? dati : c));
+    }
+
+    // Chiudi il form al termine
+    this.mostraForm.set(false);
   }
 
   eliminaCliente(id: string) {
     if (confirm('Sei sicuro di voler eliminare questo cliente dalla rubrica?')) {
-      // Rimuove il cliente dalla lista locale
       this.clienti.update(list => list.filter(c => c.id !== id));
     }
   }
