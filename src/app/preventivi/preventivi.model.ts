@@ -4,6 +4,7 @@ export interface InvoiceItem {
   id: string;
   description: string;
   quantity: number | string;
+  unitaMisura: string;
   rate: number | string;
   amount: number;
 }

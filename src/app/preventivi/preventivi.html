@@ -115,7 +115,8 @@
           <thead class="table-light">
           <tr>
             <th>Descrizione Lavoro</th>
-            <th style="width: 120px;">Quantità</th>
+            <th style="width: 100px;">Quantità</th>
+            <th style="width: 100px;">U.M.</th>
             <th style="width: 150px;">Prezzo Unit. (€)</th>
             <th class="text-end" style="width: 150px;">Importo</th>
             <th class="text-center" style="width: 80px;">Azioni</th>
@@ -139,6 +140,22 @@
                          min="1"
                          type="number">
                 </td>
+
+                <td>
+                  <select
+                    (ngModelChange)="preventiviService.updateItem(i, 'unitaMisura', $event)"
+                    [ngModel]="item.unitaMisura || 'pz'"
+                    class="form-select text-center">
+                    <option value="pz">pz</option>
+                    <option value="mq">mq</option>
+                    <option value="ml">ml</option>
+                    <option value="mc">mc</option>
+                    <option value="h">h</option>
+                    <option value="corpo">a corpo</option>
+                  </select>
+                </td>
+
+
                 <td>
                   <input (ngModelChange)="preventiviService.updateItem(i, 'rate', $event)" [ngModel]="item.rate"
                          class="form-control" min="0"
@@ -193,7 +210,10 @@
     </div>
 
   } @else {
-    <div class="card p-5 shadow-sm border-0 bg-white mx-auto" id="invoice-preview-container" style="max-width: 900px;">
+
+
+    <div class="card p-5 shadow-sm border-0 bg-white mx-auto" id="invoice-preview-container" style="max-width: 1000px;">
+
 
       <div class="d-flex justify-content-between align-items-start mb-4">
 
@@ -238,6 +258,7 @@
           <th class="py-3">Descrizione</th>
 
           <th class="py-3 text-center text-nowrap" style="width: 1%;">Q.tà</th>
+          <th class="py-3 text-center text-nowrap" style="width: 1%;">U.M</th>
           <th class="py-3 text-end text-nowrap" style="width: 1%;">Prezzo Unit.</th>
           <th class="py-3 text-end text-nowrap" style="width: 1%;">Importo</th>
         </tr>
@@ -248,6 +269,7 @@
 
               <td class="py-3" style="white-space: pre-wrap; word-break: break-word;">{{ item.description || '-' }}</td>
               <td class="py-3 text-center text-nowrap">{{ item.quantity }}</td>
+              <td class="py-3 text-center text-nowrap">{{ item.unitaMisura }}</td>
               <td class="py-3 text-end text-nowrap">€ {{ item.rate | number:'1.2-2' }}</td>
               <td class="py-3 text-end fw-bold text-nowrap">€ {{ item.amount | number:'1.2-2' }}</td>
             </tr>

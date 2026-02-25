@@ -28,7 +28,7 @@ export class PreventiviService {
     toName: '',
     toEmail: '',
     toPiva: '',
-    items: [{id: Date.now().toString(), description: '', quantity: 1, rate: 0, amount: 0}],
+    items: [{id: Date.now().toString(), description: '', unitaMisura: 'pz', quantity: 1, rate: 0, amount: 0}],
     taxRate: 22, // Possiamo impostare l'IVA italiana di default al 22%
     subtotal: 0,
     taxAmount: 0,
@@ -65,6 +65,7 @@ export class PreventiviService {
       id: Date.now().toString(),
       description: '',
       quantity: 1,
+      unitaMisura: 'pz',
       rate: 0,
       amount: 0,
     };
@@ -192,7 +193,7 @@ export class PreventiviService {
       toName: '',
       toEmail: '',
       toPiva: '',
-      items: [{id: Date.now().toString(), description: '', quantity: 1, rate: 0, amount: 0}],
+      items: [{id: Date.now().toString(), description: '', quantity: 1, unitaMisura: 'pz', rate: 0, amount: 0}],
       taxRate: 22,
       subtotal: 0,
       taxAmount: 0,
