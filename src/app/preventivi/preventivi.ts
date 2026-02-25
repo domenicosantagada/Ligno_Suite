@@ -154,7 +154,7 @@ export class Preventivi implements OnInit {
       const fileName = this.invoice().invoiceNumber ? `Preventivo_${this.invoice().invoiceNumber}.pdf` : 'Preventivo_Bozza.pdf';
 
       const opt: any = {
-        margin: [1, 1, 1, 1],
+        margin: [0, 0, 0, 0], // Margini in cm (top/bottom, left/right)
         filename: fileName,
         image: {type: 'jpeg', quality: 0.98},
         html2canvas: {scale: 2, useCORS: true},
