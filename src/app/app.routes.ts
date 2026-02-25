@@ -34,6 +34,4 @@ export const routes: Routes = [
   {path: "prezzario", component: Prezzario},
   {path: "rubrica", component: Rubrica},
   {path: "impostazioni", component: Impostazioni}
-
-
 ];
