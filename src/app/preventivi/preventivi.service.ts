@@ -12,7 +12,7 @@ export class PreventiviService {
 
 
   // 1. Aggiungi questa riga per ricordare il numero originale del documento aperto
-  originalInvoiceNumber: string | null = null;
+  originalInvoiceNumber: number | null = null;
 
   private http = inject(HttpClient); // Inietta il client HTTP
   private authService = inject(Auth); // <-- Inietta Auth
@@ -20,7 +20,7 @@ export class PreventiviService {
   // Dati iniziali di default
 
   private initialData: InvoiceData = {
-    invoiceNumber: '',
+    invoiceNumber: null,
     date: new Date().toISOString().split('T')[0], // Data di oggi in formato YYYY-MM-DD
     fromName: '',
     fromEmail: '',
@@ -37,6 +37,20 @@ export class PreventiviService {
 
   // Stato globale del preventivo gestito tramite Signal
   invoice = signal<InvoiceData>(this.initialData);
+
+  // Metodo per ottenere il numero successivo del preventivo
+  ottieniProssimoNumero() {
+    const utenteLoggato = this.authService.getUtenteLoggato();
+    if (!utenteLoggato) return;
+
+    this.http.get<number>(`${this.apiUrl}/next-number?utenteId=${utenteLoggato.id}`).subscribe({
+      next: (nextNum) => {
+        // Appena il server risponde, compila il campo in automatico!
+        this.updateInvoice({invoiceNumber: nextNum});
+      },
+      error: (err) => console.error('Errore durante il calcolo del progressivo:', err)
+    });
+  }
 
   // Metodo per aggiornare l'intero preventivo o parte di esso
   updateInvoice(updates: Partial<InvoiceData>) {
@@ -103,10 +117,14 @@ export class PreventiviService {
     const data = this.invoice();
 
     // 1. CONTROLLO CAMPI VUOTI (Sicurezza)
-    if (!data.invoiceNumber || data.invoiceNumber.trim() === '') {
-      alert('Errore: Inserire un numero di preventivo.');
+
+    // Nuovo controllo per il numero (essendo un 'number', basta verificare che non sia nullo o 0)
+    if (!data.invoiceNumber || data.invoiceNumber <= 0) {
+      alert('Errore: Inserire un numero di preventivo valido.');
       return;
     }
+
+    // Il nome del cliente rimane una stringa, quindi il trim() va bene qui
     if (!data.toName || data.toName.trim() === '') {
       alert('Errore: Inserire il nome del cliente.');
       return;
@@ -177,7 +195,7 @@ export class PreventiviService {
   }
 
   // Metodo per ELIMINARE dal DB
-  eliminaPreventivoDalDb(id: string) {
+  eliminaPreventivoDalDb(id: number) {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
@@ -185,7 +203,7 @@ export class PreventiviService {
   resetInvoice() {
     this.originalInvoiceNumber = null;
     this.invoice.set({
-      invoiceNumber: '',
+      invoiceNumber: null,
       date: new Date().toISOString().split('T')[0],
       fromName: '',
       fromEmail: '',

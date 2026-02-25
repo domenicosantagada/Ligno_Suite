@@ -21,8 +21,10 @@ export class ListaPreventivi implements OnInit {
 
   filteredPreventivi = computed(() => {
     const term = this.searchTerm().toLowerCase();
+
     return this.preventivi().filter(p =>
-      (p.invoiceNumber && p.invoiceNumber.toLowerCase().includes(term)) ||
+      // Convertiamo invoiceNumber in stringa prima di usare includes()
+      (p.invoiceNumber && p.invoiceNumber.toString().includes(term)) ||
       (p.toName && p.toName.toLowerCase().includes(term))
     );
   });
@@ -61,7 +63,7 @@ export class ListaPreventivi implements OnInit {
 
   // --- FINE NUOVI METODI ---
 
-  eliminaPreventivo(numero: string) {
+  eliminaPreventivo(numero: number) {
     if (!numero) return;
     if (confirm(`Sei sicuro di voler eliminare il preventivo ${numero}?`)) {
       this.preventiviService.eliminaPreventivoDalDb(numero).subscribe({

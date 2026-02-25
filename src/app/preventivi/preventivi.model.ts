@@ -10,7 +10,7 @@ export interface InvoiceItem {
 }
 
 export interface InvoiceData {
-  invoiceNumber: string;
+  invoiceNumber: number | null;
   date: string;
 
   fromName: string;

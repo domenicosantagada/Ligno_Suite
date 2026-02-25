@@ -31,8 +31,8 @@
           <label class="form-label fw-bold text-secondary">Numero Preventivo</label>
           <input (ngModelChange)="preventiviService.updateInvoice({invoiceNumber: $event})"
                  [ngModel]="invoice().invoiceNumber" class="form-control"
-                 placeholder="Es. INV-001"
-                 type="text">
+                 min="1"
+                 type="number">
         </div>
         <div class="col-md-6">
           <label class="form-label fw-bold text-secondary">Data</label>

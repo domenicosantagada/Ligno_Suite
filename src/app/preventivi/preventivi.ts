@@ -43,6 +43,12 @@ export class Preventivi implements OnInit {
         this.isPreview.set(true);
       } else {
         this.isPreview.set(false);
+
+        // Se sto aprendo un nuovo preventivo (non ha ancora un numero)
+        // chiedo al service di compilarmelo in automatico
+        if (this.invoice().invoiceNumber === null) {
+          this.preventiviService.ottieniProssimoNumero();
+        }
       }
     });
 
@@ -84,7 +90,7 @@ export class Preventivi implements OnInit {
   async puoAbbandonarePagina(): Promise<boolean> {
     const inv = this.invoice();
 
-    const haDati = inv.invoiceNumber !== '' ||
+    const haDati =
       inv.toName !== '' ||
       inv.fromName !== '' ||
       (inv.items.length > 0 && inv.items[0].description !== '');
