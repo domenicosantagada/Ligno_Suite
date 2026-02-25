@@ -8,8 +8,8 @@ import {RubricaService} from '../rubrica/rubrica.service';
 import {Cliente} from '../rubrica/rubrica';
 import Swal from 'sweetalert2';
 
-// @ts-ignore
 import html2pdf from 'html2pdf.js';
+import {Auth} from '../auth/auth';
 
 @Component({
   selector: 'app-preventivi',
@@ -22,6 +22,7 @@ export class Preventivi implements OnInit {
   preventiviService = inject(PreventiviService);
   route = inject(ActivatedRoute);
   rubricaService = inject(RubricaService); // Inietta la rubrica
+  authService = inject(Auth); // <-- 1. Inietta il servizio Auth
 
   invoice = this.preventiviService.invoice;
   isPreview = signal(false);
@@ -29,6 +30,9 @@ export class Preventivi implements OnInit {
   // Variabili per l'autocompletamento
   clienti = signal<Cliente[]>([]);
   mostraDropdownClienti = signal(false);
+
+  // 2. Crea un Signal per il logo (impostato sul default)
+  logoAzienda = signal<string>('image/no_logo.png');
 
   // Signal calcolato: filtra i clienti in base a quello che c'è scritto nel nome
   clientiFiltrati = computed(() => {
@@ -51,6 +55,15 @@ export class Preventivi implements OnInit {
         }
       }
     });
+
+    // --- 3. AGGIUNGI QUESTO BLOCCO PER IL LOGO E I DATI AZIENDA ---
+    const utenteLoggato = this.authService.getUtenteLoggato();
+    if (utenteLoggato) {
+      // Se l'utente ha salvato un logo in Base64, sostituisci quello di default
+      if (utenteLoggato.logoBase64) {
+        this.logoAzienda.set(utenteLoggato.logoBase64);
+      }
+    }
 
     // Carica la rubrica in background
     this.rubricaService.getClientiDalDb().subscribe({
