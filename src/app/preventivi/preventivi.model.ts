@@ -10,6 +10,7 @@ export interface InvoiceItem {
 }
 
 export interface InvoiceData {
+  id?: number; // Primary key (opzionale con '?')
   invoiceNumber: number | null;
   date: string;
 

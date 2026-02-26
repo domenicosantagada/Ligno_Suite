@@ -63,12 +63,18 @@ export class ListaPreventivi implements OnInit {
 
   // --- FINE NUOVI METODI ---
 
-  eliminaPreventivo(numero: number) {
-    if (!numero) return;
-    if (confirm(`Sei sicuro di voler eliminare il preventivo ${numero}?`)) {
-      this.preventiviService.eliminaPreventivoDalDb(numero).subscribe({
+  eliminaPreventivo(preventivo: InvoiceData) {
+    // Controlliamo che esista l'ID del database
+    if (!preventivo.id) return;
+
+    // Nel messaggio (confirm) mostriamo l'invoiceNumber (es. "1")
+    if (confirm(`Sei sicuro di voler eliminare il preventivo N° ${preventivo.invoiceNumber}?`)) {
+
+      // Al service (e quindi al backend) passiamo l'ID del database (es. 1045)
+      this.preventiviService.eliminaPreventivoDalDb(preventivo.id).subscribe({
         next: () => {
-          this.preventivi.update(list => list.filter(p => p.invoiceNumber !== numero));
+          // Aggiorniamo la lista filtrando per ID
+          this.preventivi.update(list => list.filter(p => p.id !== preventivo.id));
         },
         error: (err) => console.error('Errore durante l\'eliminazione:', err)
       });

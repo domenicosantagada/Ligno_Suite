@@ -154,7 +154,7 @@ export class PreventiviService {
     // 4. ESEGUIAMO LA CHIAMATA CORRETTA AL SERVER
     if (isUpdate) {
       // ---> MODALITÀ MODIFICA (Usa PUT)
-      this.http.put<InvoiceData>(`${this.apiUrl}/${preventivoDaSalvare.invoiceNumber}`, preventivoDaSalvare).subscribe({
+      this.http.put<InvoiceData>(`${this.apiUrl}/${preventivoDaSalvare.id}`, preventivoDaSalvare).subscribe({
         next: () => {
           alert('Preventivo aggiornato con successo!');
         },
