@@ -32,6 +32,7 @@ export class PreventiviService {
     taxRate: 22, // Possiamo impostare l'IVA italiana di default al 22%
     subtotal: 0,
     taxAmount: 0,
+    discount: 0,
     total: 0
   };
 
@@ -57,12 +58,17 @@ export class PreventiviService {
     this.invoice.update(current => {
       const newInvoice = {...current, ...updates};
 
-      // Se aggiorniamo gli elementi o l'IVA, ricalcoliamo i totali
-      if (updates.items || updates.taxRate !== undefined) {
+      // AGGIUNTO: controlliamo anche se cambia il discount
+      if (updates.items || updates.taxRate !== undefined || updates.discount !== undefined) {
+
         const itemsToCalc = updates.items || current.items;
         const taxToCalc = updates.taxRate !== undefined ? updates.taxRate : current.taxRate;
 
-        const {subtotal, taxAmount, total} = this.calculateTotals(itemsToCalc, taxToCalc);
+        // RECUPERIAMO IL VALORE DELLO SCONTO
+        const discountToCalc = updates.discount !== undefined ? updates.discount : current.discount;
+
+        // PASSIAMO LO SCONTO ALLA FUNZIONE calculateTotals
+        const {subtotal, taxAmount, total} = this.calculateTotals(itemsToCalc, taxToCalc, discountToCalc);
 
         newInvoice.subtotal = subtotal;
         newInvoice.taxAmount = taxAmount;
@@ -213,6 +219,7 @@ export class PreventiviService {
       toPiva: '',
       items: [{id: Date.now().toString(), description: '', quantity: 1, unitaMisura: 'pz', rate: 0, amount: 0}],
       taxRate: 22,
+      discount: 0,
       subtotal: 0,
       taxAmount: 0,
       total: 0
@@ -227,7 +234,7 @@ export class PreventiviService {
   }
 
   // Logica traslata fedelmente da utils/calculations.ts
-  private calculateTotals(items: InvoiceItem[], taxRate: number | string) {
+  private calculateTotals(items: InvoiceItem[], taxRate: number | string, discount: number = 0) {
     const subtotal = items.reduce((sum, item) => {
       const amount = typeof item.amount === 'number' ? item.amount : 0;
       return sum + amount;
@@ -235,7 +242,12 @@ export class PreventiviService {
 
     const rate = typeof taxRate === 'number' ? taxRate : taxRate === '' ? 0 : Number(taxRate);
     const taxAmount = (subtotal * rate) / 100;
-    const total = subtotal + taxAmount;
+
+    // 3. Calcolo del totale finale sottraendo lo sconto
+    // Assicuriamoci che discount sia un numero
+    const discountVal = typeof discount === 'number' ? discount : Number(discount) || 0;
+    const total = (subtotal + taxAmount) - discountVal;
+
 
     return {subtotal, taxAmount, total};
   }

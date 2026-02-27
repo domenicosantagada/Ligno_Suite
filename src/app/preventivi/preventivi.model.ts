@@ -26,6 +26,7 @@ export interface InvoiceData {
   taxRate: number | string;
   subtotal: number;
   taxAmount: number;
+  discount: number;
   total: number;
   utenteId?: number; // AGGIUNGI QUESTO (opzionale con '?')
 }

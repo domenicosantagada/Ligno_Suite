@@ -195,9 +195,17 @@
                      min="0" type="number">
             </div>
 
-            <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+            <div class="d-flex justify-content-between mb-2">
               <span class="text-muted">Importo IVA:</span>
               <span>€ {{ invoice().taxAmount | number:'1.2-2' }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+              <span class="text-danger">Sconto (€):</span>
+              <input (ngModelChange)="preventiviService.updateInvoice({discount: $event})"
+                     [ngModel]="invoice().discount"
+                     class="form-control form-control-sm w-25 text-end text-danger fw-bold"
+                     min="0" type="number">
             </div>
 
             <div class="d-flex justify-content-between fw-bold fs-4 text-primary">
@@ -286,10 +294,18 @@
               <td class="text-muted text-end pb-1 text-nowrap">Imponibile:</td>
               <td class="text-end pb-1 text-nowrap">€ {{ invoice().subtotal | number:'1.2-2' }}</td>
             </tr>
-            <tr class="border-bottom">
-              <td class="text-muted text-end pb-3 text-nowrap">IVA ({{ invoice().taxRate }}%):</td>
-              <td class="text-end pb-3 text-nowrap">€ {{ invoice().taxAmount | number:'1.2-2' }}</td>
+            <tr>
+              <td class="text-muted text-end pb-1 text-nowrap">IVA ({{ invoice().taxRate }}%):</td>
+              <td class="text-end pb-1 text-nowrap">€ {{ invoice().taxAmount | number:'1.2-2' }}</td>
             </tr>
+
+              @if (invoice().discount > 0) {
+                <tr class="border-bottom">
+                  <td class="text-danger text-end pb-1 text-nowrap">Sconto:</td>
+                  <td class="text-end pb-1 text-nowrap text-danger">- € {{ invoice().discount | number:'1.2-2' }}</td>
+                </tr>
+              }
+
             <tr>
               <td class="text-end fw-bold fs-4 text-primary pt-3 text-nowrap">TOTALE:</td>
               <td class="text-end fw-bold fs-4 text-primary pt-3 text-nowrap">€ {{ invoice().total | number:'1.2-2' }}
