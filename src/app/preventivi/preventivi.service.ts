@@ -1,73 +1,65 @@
-// src/app/preventivi/preventivi.service.ts
 import {inject, Injectable, signal} from '@angular/core';
 import {InvoiceData, InvoiceItem} from './preventivi.model';
 import {HttpClient} from '@angular/common/http';
 import {Auth} from '../auth/auth';
 
+/**
+ * SERVIZIO PREVENTIVI
+ * Gestisce la logica di business (calcoli, formattazione) e le chiamate HTTP al backend.
+ * Essendo "providedIn: 'root'", i dati inseriti qui sopravvivono ai cambi di pagina.
+ */
 @Injectable({
   providedIn: 'root'
 })
-
 export class PreventiviService {
 
-
-  // 1. Aggiungi questa riga per ricordare il numero originale del documento aperto
+  // Fondamentale per capire se stiamo modificando un preventivo esistente o creandone uno nuovo/clonato.
   originalInvoiceNumber: number | null = null;
 
-  private http = inject(HttpClient); // Inietta il client HTTP
-  private authService = inject(Auth); // <-- Inietta Auth
-  private apiUrl = 'http://localhost:8080/api/preventivi'; // L'URL di Spring Boot
-  // Dati iniziali di default
+  private http = inject(HttpClient);
+  private authService = inject(Auth);
+  private apiUrl = 'http://localhost:8080/api/preventivi';
 
+  // Oggetto "scheletro" usato per resettare o inizializzare un nuovo preventivo
   private initialData: InvoiceData = {
     invoiceNumber: null,
-    date: new Date().toISOString().split('T')[0], // Data di oggi in formato YYYY-MM-DD
-    fromName: '',
-    fromEmail: '',
-    fromPiva: '',
-    toName: '',
-    toEmail: '',
-    toPiva: '',
+    date: new Date().toISOString().split('T')[0], // Data di oggi (YYYY-MM-DD)
+    fromName: '', fromEmail: '', fromPiva: '',
+    toName: '', toEmail: '', toPiva: '',
     items: [{id: Date.now().toString(), description: '', unitaMisura: 'pz', quantity: 1, rate: 0, amount: 0}],
-    taxRate: 22, // Possiamo impostare l'IVA italiana di default al 22%
-    subtotal: 0,
-    taxAmount: 0,
-    discount: 0,
-    total: 0
+    taxRate: 22, subtotal: 0, taxAmount: 0, discount: 0, total: 0
   };
 
-  // Stato globale del preventivo gestito tramite Signal
+  /**
+   * SIGNAL DELLO STATO: contiene il preventivo correntemente aperto.
+   */
   invoice = signal<InvoiceData>(this.initialData);
 
-  // Metodo per ottenere il numero successivo del preventivo
   ottieniProssimoNumero() {
     const utenteLoggato = this.authService.getUtenteLoggato();
     if (!utenteLoggato) return;
 
     this.http.get<number>(`${this.apiUrl}/next-number?utenteId=${utenteLoggato.id}`).subscribe({
       next: (nextNum) => {
-        // Appena il server risponde, compila il campo in automatico!
         this.updateInvoice({invoiceNumber: nextNum});
       },
       error: (err) => console.error('Errore durante il calcolo del progressivo:', err)
     });
   }
 
-  // Metodo per aggiornare l'intero preventivo o parte di esso
+  /**
+   * AGGIORNAMENTO PARZIALE E RICALCOLO: Permette di aggiornare solo alcuni campi del preventivo senza sovrascrivere tutto l'oggetto.
+   */
   updateInvoice(updates: Partial<InvoiceData>) {
     this.invoice.update(current => {
       const newInvoice = {...current, ...updates};
 
-      // AGGIUNTO: controlliamo anche se cambia il discount
+      // Se le modifiche riguardano righe, IVA o sconto, rifacciamo i conti
       if (updates.items || updates.taxRate !== undefined || updates.discount !== undefined) {
-
         const itemsToCalc = updates.items || current.items;
         const taxToCalc = updates.taxRate !== undefined ? updates.taxRate : current.taxRate;
-
-        // RECUPERIAMO IL VALORE DELLO SCONTO
         const discountToCalc = updates.discount !== undefined ? updates.discount : current.discount;
 
-        // PASSIAMO LO SCONTO ALLA FUNZIONE calculateTotals
         const {subtotal, taxAmount, total} = this.calculateTotals(itemsToCalc, taxToCalc, discountToCalc);
 
         newInvoice.subtotal = subtotal;
@@ -79,33 +71,28 @@ export class PreventiviService {
     });
   }
 
-  // Aggiunge una nuova riga vuota
   addItem() {
     const newItem: InvoiceItem = {
-      id: Date.now().toString(),
-      description: '',
-      quantity: 1,
-      unitaMisura: 'pz',
-      rate: 0,
-      amount: 0,
+      id: Date.now().toString(), // Genera un ID temporaneo basato sui millisecondi
+      description: '', quantity: 1, unitaMisura: 'pz', rate: 0, amount: 0,
     };
     this.updateInvoice({items: [...this.invoice().items, newItem]});
   }
 
-  // Rimuove una riga (assicurandosi che ne resti sempre almeno una)
   removeItem(index: number) {
     const currentItems = this.invoice().items;
     if (currentItems.length > 1) {
+      // filter() restituisce un nuovo array escludendo la riga con l'indice specificato
       const newItems = currentItems.filter((_, i) => i !== index);
       this.updateInvoice({items: newItems});
     }
   }
 
-  // Aggiorna un singolo campo di una riga specifica e calcola il nuovo importo riga
   updateItem(index: number, field: keyof InvoiceItem, value: string | number) {
     const newItems = [...this.invoice().items];
     newItems[index] = {...newItems[index], [field]: value};
 
+    // Calcolo al volo dell'importo della singola riga (Quantità x Prezzo)
     if (field === 'quantity' || field === 'rate') {
       const quantityValue = newItems[index].quantity;
       const rateValue = newItems[index].rate;
@@ -119,67 +106,62 @@ export class PreventiviService {
     this.updateInvoice({items: newItems});
   }
 
+  /**
+   * SALVATAGGIO: Gestisce intelligentemente la Creazione (POST),
+   * la Modifica (PUT) e la funzione "Salva con nome".
+   */
   salvaPreventivoNelDb() {
     const data = this.invoice();
 
-    // 1. CONTROLLO CAMPI VUOTI (Sicurezza)
-
-    // Nuovo controllo per il numero (essendo un 'number', basta verificare che non sia nullo o 0)
     if (!data.invoiceNumber || data.invoiceNumber <= 0) {
       alert('Errore: Inserire un numero di preventivo valido.');
       return;
     }
 
-    // Il nome del cliente rimane una stringa, quindi il trim() va bene qui
     if (!data.toName || data.toName.trim() === '') {
       alert('Errore: Inserire il nome del cliente.');
       return;
     }
 
+    // Copia profonda per evitare di modificare inavvertitamente lo stato in memoria
     const preventivoDaSalvare = JSON.parse(JSON.stringify(data));
 
-    // AGGIUNGI L'ID DELL'UTENTE LOGGATO AL PREVENTIVO
     const utenteLoggato = this.authService.getUtenteLoggato();
     if (utenteLoggato) {
       preventivoDaSalvare.utenteId = utenteLoggato.id;
     }
 
-    // 2. CAPIAMO L'INTENZIONE DELL'UTENTE
-    // È un aggiornamento SOLO se l'utente aveva aperto un preventivo esistente
-    // e NON ha cambiato il suo numero.
+    // CAPIRE L'INTENZIONE DELL'UTENTE
+    // È una MODIFICA vera e propria solo se l'ID originario coincide con quello attuale.
     const isUpdate = this.originalInvoiceNumber && (this.originalInvoiceNumber === preventivoDaSalvare.invoiceNumber);
 
-    // 3. LOGICA "SALVA CON NOME"
-    // Se ha cambiato numero, rigeneriamo gli ID delle righe per evitare conflitti nel DB
+    // LOGICA "SALVA CON NOME":
+    // L'utente aveva aperto il prev. N°10, ma ha cambiato il numero in 11 per farne uno nuovo.
+    // Dobbiamo rigenerare gli ID delle singole righe, altrimenti Hibernate/Spring Boot andrà in errore
+    // per violazione di chiavi primarie duplicate.
     if (this.originalInvoiceNumber && this.originalInvoiceNumber !== preventivoDaSalvare.invoiceNumber) {
       preventivoDaSalvare.items.forEach((item: any, index: number) => {
         item.id = Date.now().toString() + '-' + index;
       });
     }
 
-    // 4. ESEGUIAMO LA CHIAMATA CORRETTA AL SERVER
     if (isUpdate) {
-      // ---> MODALITÀ MODIFICA (Usa PUT)
+      // ---> MODALITÀ MODIFICA (PUT)
       this.http.put<InvoiceData>(`${this.apiUrl}/${preventivoDaSalvare.id}`, preventivoDaSalvare).subscribe({
-        next: () => {
-          alert('Preventivo aggiornato con successo!');
-        },
+        next: () => alert('Preventivo aggiornato con successo!'),
         error: (err) => {
           alert('Errore durante l\'aggiornamento: ' + (err.error?.message || 'Errore generico'));
           console.error(err);
         }
       });
-
     } else {
-      // ---> MODALITÀ CREAZIONE O "SALVA CON NOME" (Usa POST)
+      // ---> MODALITÀ CREAZIONE O "SALVA CON NOME" (POST)
       this.http.post<InvoiceData>(this.apiUrl, preventivoDaSalvare).subscribe({
         next: () => {
           alert('Nuovo preventivo salvato con successo!');
-          // Ora il nuovo numero diventa l'originale
-          this.originalInvoiceNumber = preventivoDaSalvare.invoiceNumber;
+          this.originalInvoiceNumber = preventivoDaSalvare.invoiceNumber; // Il nuovo numero diventa l'originale
         },
         error: (err) => {
-          // Gestione dell'errore "Duplicato" (409 Conflict dal backend)
           if (err.status === 409) {
             alert('Errore: Il numero preventivo "' + preventivoDaSalvare.invoiceNumber + '" è già utilizzato.');
           } else {
@@ -191,49 +173,34 @@ export class PreventiviService {
     }
   }
 
-  // Aggiungi questo NUOVO metodo per leggere dal DB
   getTuttiIPreventivi() {
     const utenteLoggato = this.authService.getUtenteLoggato();
     const utenteId = utenteLoggato ? utenteLoggato.id : 0;
-
-    // Aggiunge ?utenteId=X all'URL
     return this.http.get<InvoiceData[]>(`${this.apiUrl}?utenteId=${utenteId}`);
   }
 
-  // Metodo per ELIMINARE dal DB
   eliminaPreventivoDalDb(id: number) {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
-  // Aggiungi questo metodo per svuotare il form quando si crea un nuovo preventivo
   resetInvoice() {
     this.originalInvoiceNumber = null;
-    this.invoice.set({
-      invoiceNumber: null,
-      date: new Date().toISOString().split('T')[0],
-      fromName: '',
-      fromEmail: '',
-      fromPiva: '',
-      toName: '',
-      toEmail: '',
-      toPiva: '',
-      items: [{id: Date.now().toString(), description: '', quantity: 1, unitaMisura: 'pz', rate: 0, amount: 0}],
-      taxRate: 22,
-      discount: 0,
-      subtotal: 0,
-      taxAmount: 0,
-      total: 0
-    });
+    this.invoice.set({...this.initialData});
   }
 
-  // 3. AGGIUNGI QUESTO NUOVO METODO per caricare i dati dalla lista in modo sicuro
+  /**
+   * Carica un documento dalla lista Archivio per la visualizzazione/modifica.
+   * Utilizza il JSON.parse(JSON.stringify) per "scollegare" l'oggetto in memoria,
+   * evitando che modificando il preventivo si aggiornino involontariamente le scritte in tabella.
+   */
   caricaPreventivoPerModifica(prev: InvoiceData) {
     this.originalInvoiceNumber = prev.invoiceNumber;
-    // Crea una copia slegata dai dati della lista per evitare problemi
     this.invoice.set(JSON.parse(JSON.stringify(prev)));
   }
 
-  // Logica traslata fedelmente da utils/calculations.ts
+  /**
+   * Logica matematica di base del documento: Imponibile + IVA - Sconto
+   */
   private calculateTotals(items: InvoiceItem[], taxRate: number | string, discount: number = 0) {
     const subtotal = items.reduce((sum, item) => {
       const amount = typeof item.amount === 'number' ? item.amount : 0;
@@ -243,11 +210,8 @@ export class PreventiviService {
     const rate = typeof taxRate === 'number' ? taxRate : taxRate === '' ? 0 : Number(taxRate);
     const taxAmount = (subtotal * rate) / 100;
 
-    // 3. Calcolo del totale finale sottraendo lo sconto
-    // Assicuriamoci che discount sia un numero
     const discountVal = typeof discount === 'number' ? discount : Number(discount) || 0;
     const total = (subtotal + taxAmount) - discountVal;
-
 
     return {subtotal, taxAmount, total};
   }

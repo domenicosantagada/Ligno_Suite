@@ -3,6 +3,9 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">Gestione Preventivi</h2>
     <div>
+
+      <!-- BOTTONE ANTEPRIMA / SALVA -->
+      <!-- Se siamo in modalità anteprima, mostriamo i pulsanti per tornare alla modifica e scaricare il PDF -->
       @if (isPreview()) {
         <button (click)="togglePreview()" class="btn btn-outline-secondary me-2">
           <i class="bi bi-pencil"></i> Torna alla Modifica
@@ -11,6 +14,7 @@
           <i class="bi bi-download"></i> Scarica PDF
         </button>
       } @else {
+        <!-- Se non siamo in modalità anteprima, mostriamo i pulsanti per visualizzare l'anteprima e salvare il preventivo -->
         <button (click)="togglePreview()" class="btn btn-dark btn-sm px-4 rounded-pill me-2">
           <i class="bi bi-eye"></i> Vedi Anteprima
         </button>
@@ -23,19 +27,27 @@
     </div>
   </div>
 
+  <!-- SEZIONE DI MODIFICA PREVENTIVO -->
   @if (!isPreview()) {
     <div class="card p-4 shadow-sm mb-4 border-0 bg-white">
 
       <div class="row g-4 mb-4">
         <div class="col-md-6">
           <label class="form-label fw-bold text-secondary">Numero Preventivo</label>
+
+          <!-- Il numero del preventivo è un campo numerico che accetta solo valori interi positivi. -->
+          <!-- Quando l'utente modifica il numero del preventivo, viene chiamato il metodo updateInvoice
+          del servizio preventiviService per aggiornare lo stato del preventivo con il nuovo numero. -->
           <input (ngModelChange)="preventiviService.updateInvoice({invoiceNumber: $event})"
                  [ngModel]="invoice().invoiceNumber" class="form-control"
                  min="1"
                  type="number">
         </div>
+
         <div class="col-md-6">
           <label class="form-label fw-bold text-secondary">Data</label>
+
+          <!-- La data del preventivo è un campo di input di tipo "date" che consente all'utente di selezionare una data. -->
           <input (ngModelChange)="preventiviService.updateInvoice({date: $event})" [ngModel]="invoice().date"
                  class="form-control"
                  type="date">
@@ -49,15 +61,19 @@
           <div class="p-3 bg-light rounded">
             <h5 class="mb-3">Emittente
             </h5>
+
+            <!-- Il nome dell'emittente è un campo di input di testo che consente all'utente di inserire il nome della falegnameria o dell'azienda che emette il preventivo. -->
             <input (ngModelChange)="preventiviService.updateInvoice({fromName: $event})" [ngModel]="invoice().fromName"
                    class="form-control mb-2"
                    placeholder="Nome Falegnameria / Azienda" type="text">
 
+            <!-- L'indirizzo email dell'emittente è un campo di input di testo che consente all'utente di inserire l'indirizzo email della falegnameria o dell'azienda. -->
             <input (ngModelChange)="preventiviService.updateInvoice({fromEmail: $event})"
                    [ngModel]="invoice().fromEmail" class="form-control mb-2"
                    placeholder="Indirizzo Email"
                    type="email">
 
+            <!-- La partita IVA o codice fiscale dell'emittente è un campo di input di testo che consente all'utente di inserire la partita IVA o il codice fiscale della falegnameria o dell'azienda. -->
             <input (ngModelChange)="preventiviService.updateInvoice({fromPiva: $event})"
                    [ngModel]="invoice().fromPiva" class="form-control"
                    placeholder="P.IVA / C.F." type="text">
@@ -71,6 +87,11 @@
             <h5 class="mb-3">Cliente</h5>
 
             <div class="position-relative mb-2">
+
+              <!-- Il nome del cliente è un campo di input di testo che consente all'utente di inserire il nome del cliente a cui è destinato il preventivo. -->
+              <!-- Quando l'utente modifica il nome del cliente, viene chiamato il metodo onNomeClienteChange per filtrare la lista dei clienti e mostrare un dropdown con i risultati corrispondenti. -->
+              <!-- Il dropdown dei clienti viene mostrato quando l'input del nome del cliente è in focus e ci sono clienti filtrati da mostrare. -->
+              <!-- blur e focus sono usati per gestire la visibilità del dropdown in modo più fluida, evitando che si chiuda immediatamente quando si clicca su un elemento del dropdown. -->
               <input (blur)="nascondiDropdownRitardato()"
                      (focus)="mostraDropdownClienti.set(true)"
                      (ngModelChange)="onNomeClienteChange($event)"
@@ -80,12 +101,17 @@
                      placeholder="Nome / Azienda Cliente"
                      type="text"> @if (mostraDropdownClienti() && clientiFiltrati().length > 0) {
               <ul class="dropdown-menu show w-100 position-absolute custom-autocomplete-dropdown shadow-sm">
+
+                <!-- Il dropdown mostra una lista di clienti filtrati in base al nome inserito. -->
                 @for (cliente of clientiFiltrati(); track cliente.id) {
                   <li>
+
+                    <!-- Quando l'utente clicca su un cliente nel dropdown, viene chiamato il metodo selezionaClienteDaDropdown per aggiornare lo stato del preventivo con i dati del cliente selezionato e chiudere il dropdown. -->
                     <button (click)="selezionaClienteDaDropdown(cliente)" class="dropdown-item py-2" type="button">
                       <div
                         class="fw-bold text-dark">{{ cliente.nome }}
                       </div>
+                      <!-- Se il cliente ha un indirizzo email, viene mostrato sotto il nome in un testo più piccolo e grigio. -->
                       @if (cliente.email) {
                         <div class="small text-muted">{{ cliente.email }}</div>
                       }
@@ -96,10 +122,14 @@
             }
             </div>
 
+            <!-- L'indirizzo email del cliente è un campo di input di testo che consente all'utente di inserire l'indirizzo email del cliente. -->
+            <!-- ngModelChange viene usato per aggiornare lo stato del preventivo ogni volta che l'utente modifica l'indirizzo email del cliente. -->
             <input (ngModelChange)="preventiviService.updateInvoice({toEmail: $event})" [ngModel]="invoice().toEmail"
                    class="form-control mb-2"
                    placeholder="Indirizzo Email" type="email">
 
+            <!-- La partita IVA o codice fiscale del cliente è un campo di input di testo che consente all'utente di inserire la partita IVA o il codice fiscale del cliente. -->
+            <!-- ngModelChange viene usato per aggiornare lo stato del preventivo ogni volta che l'utente modifica la partita IVA o il codice fiscale del cliente. -->
             <input (ngModelChange)="preventiviService.updateInvoice({toPiva: $event})" [ngModel]="invoice().toPiva"
                    class="form-control"
                    placeholder="P.IVA / C.F." type="text">
@@ -123,9 +153,16 @@
           </tr>
           </thead>
           <tbody>
+
+          <!-- La tabella delle voci del preventivo viene popolata iterando sulla lista degli items del preventivo. -->
+          <!-- con il for, per ogni item viene creato una riga della tabella con campi di input per la descrizione, quantità, unità di misura e prezzo unitario. -->
+          <!-- Ogni campo di input ha un evento ngModelChange che chiama il metodo updateItem del servizio preventiviService per aggiornare lo stato del preventivo con i nuovi valori inseriti dall'utente. -->
             @for (item of invoice().items; track item.id; let i = $index) {
               <tr class="border-bottom">
                 <td>
+
+                  <!-- La descrizione del lavoro o prodotto è un campo di textarea che consente all'utente di inserire una descrizione dettagliata della voce del preventivo. -->
+                  <!-- ngModelChange viene usato per aggiornare lo stato del preventivo ogni volta che l'utente modifica la descrizione della voce. -->
                   <textarea
                     (ngModelChange)="preventiviService.updateItem(i, 'description', $event)"
                     [ngModel]="item.description"
@@ -135,6 +172,9 @@
                   </textarea>
                 </td>
                 <td>
+
+                  <!-- La quantità è un campo di input di tipo "number" che consente all'utente di inserire la quantità del lavoro o prodotto. -->
+                  <!-- ngModelChange viene usato per aggiornare lo stato del preventivo ogni volta che l'utente modifica la quantità della voce. -->
                   <input (ngModelChange)="preventiviService.updateItem(i, 'quantity', $event)" [ngModel]="item.quantity"
                          class="form-control"
                          min="1"
@@ -142,6 +182,8 @@
                 </td>
 
                 <td>
+
+                  <!-- selezione dell'unità di misura è un campo di select che consente all'utente di scegliere l'unità di misura per la quantità inserita. -->
                   <select
                     (ngModelChange)="preventiviService.updateItem(i, 'unitaMisura', $event)"
                     [ngModel]="item.unitaMisura || 'pz'"
@@ -176,6 +218,8 @@
         </table>
       </div>
 
+      <!-- Il pulsante per aggiungere una nuova voce al preventivo chiama il metodo addItem del servizio preventiviService,
+       che aggiunge una nuova voce vuota alla lista degli items del preventivo. -->
       <button (click)="preventiviService.addItem()" class="btn btn-secondary btn-sm mb-4">
         + Aggiungi Voce
       </button>
@@ -218,8 +262,7 @@
     </div>
 
   } @else {
-
-
+    <!-- se siamo in modalità anteprima, mostriamo una versione statica del preventivo formattata come un documento, senza campi di input modificabili. -->
     <div class="card p-5 shadow-sm border-0 bg-white mx-auto" id="invoice-preview-container" style="max-width: 1000px;">
 
 
@@ -229,7 +272,6 @@
           <img [src]="logoAzienda()" alt="Logo" class="d-inline-block align-text-top" height="90">
         </div>
 
-        <!-- BLOCCO DESTRA (TITOLO PREVENTIVO) -->
         <div class="text-end">
           <div class="h2 fw-bold text-primary mb-1">
             PREVENTIVO
@@ -241,7 +283,6 @@
 
       </div>
 
-      <!-- SEPARATORE -->
       <hr class="4">
 
       <div class="row mb-4">
@@ -272,6 +313,8 @@
         </tr>
         </thead>
         <tbody class="border-bottom-0">
+
+        <!-- La tabella delle voci del preventivo in modalità anteprima viene popolata iterando sulla lista degli items del preventivo, mostrando i valori formattati senza campi di input. -->
           @for (item of invoice().items; track item.id) {
             <tr style="page-break-inside: avoid; break-inside: avoid;">
 
@@ -292,6 +335,9 @@
             <tbody>
             <tr>
               <td class="text-muted text-end pb-1 text-nowrap">Imponibile:</td>
+              <!-- Il subtotale (imponibile) viene mostrato come una riga nella tabella dei totali, con il valore formattato come valuta. -->
+              <!-- text-end e text-nowrap sono usati per allineare il testo a destra e evitare che si spezzi su più righe. -->
+              <!-- number:'1.2-2' è usato per formattare il numero con almeno 1 cifra intera e 2 cifre decimali, separando le migliaia con un punto e i decimali con una virgola. -->
               <td class="text-end pb-1 text-nowrap">€ {{ invoice().subtotal | number:'1.2-2' }}</td>
             </tr>
             <tr>

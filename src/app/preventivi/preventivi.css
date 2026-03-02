@@ -11,6 +11,7 @@
   padding: 8px 0;
 }
 
+/* Stili per ogni elemento della tendina */
 .custom-autocomplete-dropdown .dropdown-item {
   cursor: pointer;
   transition: all 0.2s ease;
@@ -18,10 +19,12 @@
   background-color: transparent;
 }
 
+/* Rimuovi il bordo inferiore dall'ultimo elemento per un aspetto più pulito */
 .custom-autocomplete-dropdown .dropdown-item:last-child {
   border-bottom: none;
 }
 
+/* Stili per l'effetto hover e focus sugli elementi della tendina */
 .custom-autocomplete-dropdown .dropdown-item:hover,
 .custom-autocomplete-dropdown .dropdown-item:focus {
   background-color: #ffffff;
