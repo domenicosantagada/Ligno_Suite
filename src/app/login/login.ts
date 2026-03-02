@@ -26,7 +26,7 @@ export class Login {
     // L'email parte vuota (''), è obbligatoria e deve avere il formato @...
     email: ['', [Validators.required, Validators.email]],
     // La password parte vuota (''), è obbligatoria e deve avere almeno 6 caratteri
-    password: ['', [Validators.required, Validators.minLength(1)]] // per ora utilizzo un minLength di 1 per semplificare i test
+    password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
   // Router: serve per cambiare pagina via codice
