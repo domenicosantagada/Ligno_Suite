@@ -1,44 +1,70 @@
-/* Stile per il box di caricamento del logo */
+/* ==========================================================================
+   BOX DI CARICAMENTO LOGO (UPLOAD AREA)
+   Gestisce l'area visiva dove l'utente trascina o seleziona l'immagine.
+   ========================================================================== */
+
 .logo-upload-box {
+  /* border: 2px dashed: Crea il bordo tratteggiato */
   border: 2px dashed #dee2e6;
   border-radius: 12px;
   background-color: #f8f9fa;
+
+  /* Transizione fluida per i cambi di colore all'hover */
   transition: all 0.3s ease;
+
+  /* Dimensioni minime e centratura del contenuto (icona o anteprima) */
   min-height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden; /* Mantiene l'immagine dentro i bordi arrotondati */
+
+  /* Evita che l'immagine caricata "esca" dai bordi arrotondati del box */
+  overflow: hidden;
+  position: relative; /* Necessario per posizionare l'input invisibile al suo interno */
 }
 
-/* Cambia colore al passaggio del mouse solo se non c'è già un'immagine */
+/* FEEDBACK VISIVO ALL'HOVER
+   :not(.has-image): Applica questo stile solo se il box NON ha ancora un'immagine.
+   Migliora la UX facendo capire all'utente che l'area è cliccabile per l'invio.
+*/
 .logo-upload-box:not(.has-image):hover {
-  border-color: #0d6efd;
+  border-color: #0d6efd; /* Colore blu primario */
   background-color: #f1f6fe;
   cursor: pointer;
 }
 
-/* L'input file invisibile che copre tutta l'area */
+/* INPUT FILE INVISIBILE
+    Posizionato sopra il box, ma completamente trasparente, per catturare i clic.
+    In questo modo, quando l'utente clicca sul box, in realtà sta cliccando sull'input file.
+*/
 .file-input {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0;
+  opacity: 0; /* Nasconde l'elemento grafico brutto del browser */
   cursor: pointer;
 }
 
-/* Se c'è già un'immagine disattiviamo il cursore sull'input file per poter cliccare il tasto elimina */
+/* GESTIONE DEI LIVELLI (Z-INDEX)
+   Se l'immagine è presente, portiamo l'input file "sotto" (z-index: -1).
+   Questo serve a liberare l'area, permettendo all'utente di cliccare su
+   eventuali tasti "Elimina" che appaiono sopra l'immagine.
+*/
 .logo-upload-box.has-image .file-input {
   cursor: default;
   z-index: -1;
 }
 
-/* Immagine di anteprima */
+/* ANTEPRIMA DELL'IMMAGINE (PREVIEW)
+   Assicura che il logo caricato si adatti al box senza sgranarsi o deformarsi.
+*/
 .logo-preview {
   max-width: 100%;
   max-height: 250px;
+  /* object-fit: contain: mantiene le proporzioni originali dell'immagine
+     dentro lo spazio assegnato senza tagliarla. */
   object-fit: contain;
   padding: 10px;
 }
