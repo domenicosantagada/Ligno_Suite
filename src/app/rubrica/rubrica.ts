@@ -3,10 +3,13 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {RubricaService} from './rubrica.service';
 
-// Interfaccia aggiornata
+/**
+ * INTERFACCIA CLIENTE
+ * Definisce i campi che compongono un contatto nella nostra rubrica.
+ */
 export interface Cliente {
-  id?: number | string; // Ora può essere numero (da DB) o indefinito (nuovo)
-  utenteId?: number;    // ID del proprietario
+  id?: number | string; // È opzionale (?) perché un cliente "nuovo" non ha ancora un ID finché non lo salva il DB
+  utenteId?: number;    // ID dell'utente (falegname) a cui appartiene questo cliente
   nome: string;
   email: string;
   telefono: string;
@@ -16,24 +19,39 @@ export interface Cliente {
 @Component({
   selector: 'app-rubrica',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule], // FormsModule è vitale per usare ngModel nei campi di testo
   templateUrl: './rubrica.html',
   styleUrl: './rubrica.css',
 })
-export class Rubrica implements OnInit { // Implementiamo OnInit
+export class Rubrica implements OnInit {
 
+  // Inietta il servizio che fa le chiamate al server
   rubricaService = inject(RubricaService);
 
-  // Lista inizialmente VUOTA
+  /* ==========================================================================
+     STATO DEL COMPONENTE (Gestito con i Signal)
+     ========================================================================== */
+
+  // Lista di tutti i clienti caricati dal DB (inizialmente vuota)
   clienti = signal<Cliente[]>([]);
+
+  // Testo digitato nella barra di ricerca
   searchTerm = signal('');
 
+  // "Interruttore" per l'interfaccia:
+  // false = mostra la tabella dei clienti | true = mostra il form di inserimento/modifica
   mostraForm = signal(false);
 
-  // Cliente vuoto di base per il reset
+  // Un oggetto "vuoto" che usiamo come template per resettare il form
   clienteVuoto: Cliente = {nome: '', email: '', telefono: '', partitaIva: ''};
+
+  // Contiene i dati del cliente che stiamo correntemente creando o modificando nel form
   clienteCorrente = signal<Cliente>({...this.clienteVuoto});
 
+  /**
+   * SIGNAL CALCOLATO per la barra di ricerca.
+   * Filtra in automatico l'array dei 'clienti' ogni volta che si digita qualcosa in 'searchTerm'.
+   */
   filteredClienti = computed(() => {
     const term = this.searchTerm().toLowerCase();
     return this.clienti().filter(c =>
@@ -42,7 +60,11 @@ export class Rubrica implements OnInit { // Implementiamo OnInit
     );
   });
 
-  // All'avvio della pagina, carica i clienti dal DB!
+  /* ==========================================================================
+     CICLO DI VITA E CHIAMATE AL DATABASE
+     ========================================================================== */
+
+  // All'avvio della pagina, carica la lista dei clienti
   ngOnInit() {
     this.caricaClienti();
   }
@@ -54,37 +76,63 @@ export class Rubrica implements OnInit { // Implementiamo OnInit
     });
   }
 
+  /* ==========================================================================
+     GESTIONE DELL'INTERFACCIA (Tabella <--> Form)
+     ========================================================================== */
+
+  /**
+   * Prepara il form per un NUOVO cliente
+   */
   creaNuovo() {
-    this.clienteCorrente.set({...this.clienteVuoto}); // Svuota il form
-    this.mostraForm.set(true);
+    // Carica il cliente vuoto usando lo spread operator (...)
+    this.clienteCorrente.set({...this.clienteVuoto});
+    this.mostraForm.set(true); // Nasconde la tabella, mostra il form
   }
 
+  /**
+   * Prepara il form per MODIFICARE un cliente esistente
+   */
   modificaCliente(cliente: Cliente) {
-    this.clienteCorrente.set({...cliente}); // Copia i dati
+    // Copia i dati del cliente selezionato dentro il form
+    this.clienteCorrente.set({...cliente});
     this.mostraForm.set(true);
   }
 
+  /**
+   * Esce dal form senza salvare
+   */
   annulla() {
-    this.mostraForm.set(false);
+    this.mostraForm.set(false); // Torna alla tabella
   }
 
+  /**
+   * Aggiorna un singolo campo (es. 'nome' o 'telefono') del cliente che stiamo scrivendo.
+   * keyof Cliente garantisce che 'campo' sia esattamente una delle proprietà dell'interfaccia (es. non puoi passargli 'colore').
+   */
   aggiornaCampoForm(campo: keyof Cliente, valore: string) {
     this.clienteCorrente.update(c => ({...c, [campo]: valore}));
   }
 
+  /* ==========================================================================
+     SALVATAGGIO ED ELIMINAZIONE
+     ========================================================================== */
+
   salvaCliente() {
     const dati = this.clienteCorrente();
 
+    // Validazione base obbligatoria
     if (!dati.nome || dati.nome.trim() === '') {
       alert('Inserisci almeno la Ragione Sociale / Nome.');
       return;
     }
 
-    // Chiamata al backend
+    // Invia i dati al servizio (che deciderà in automatico se fare POST o PUT)
     this.rubricaService.salvaClienteNelDb(dati).subscribe({
       next: () => {
-        this.caricaClienti(); // Ricarica la tabella con i dati aggiornati
-        this.mostraForm.set(false); // Chiudi il form
+        // Se va a buon fine, scarichiamo di nuovo la lista aggiornata dal DB
+        this.caricaClienti();
+        // E torniamo alla schermata della tabella
+        this.mostraForm.set(false);
       },
       error: (err) => {
         alert('Errore durante il salvataggio del cliente.');
@@ -96,10 +144,12 @@ export class Rubrica implements OnInit { // Implementiamo OnInit
   eliminaCliente(id?: number | string) {
     if (!id) return;
 
+    // Chiede conferma prima di eseguire un'azione distruttiva
     if (confirm('Sei sicuro di voler eliminare questo cliente?')) {
       this.rubricaService.eliminaClienteDalDb(id).subscribe({
         next: () => {
-          this.caricaClienti(); // Ricarica la tabella aggiornata
+          // Se eliminato con successo, ricarica la lista per farlo sparire dalla tabella
+          this.caricaClienti();
         },
         error: (err) => console.error('Errore durante l\'eliminazione:', err)
       });
