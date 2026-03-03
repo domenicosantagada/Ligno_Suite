@@ -15,25 +15,28 @@ export class PreventiviService {
 
   // Fondamentale per capire se stiamo modificando un preventivo esistente o creandone uno nuovo/clonato.
   originalInvoiceNumber: number | null = null;
-
-  private http = inject(HttpClient);
-  private authService = inject(Auth);
-  private apiUrl = 'http://localhost:8080/api/preventivi';
-
-  // Oggetto "scheletro" usato per resettare o inizializzare un nuovo preventivo
-  private initialData: InvoiceData = {
+  // cercando proprietà (come invoice().date) non ancora definite.
+  invoice = signal<InvoiceData>({
     invoiceNumber: null,
-    date: new Date().toISOString().split('T')[0], // Data di oggi (YYYY-MM-DD)
+    date: new Date().toISOString().split('T')[0],
     fromName: '', fromEmail: '', fromPiva: '',
     toName: '', toEmail: '', toPiva: '',
     items: [{id: Date.now().toString(), description: '', unitaMisura: 'pz', quantity: 1, rate: 0, amount: 0}],
     taxRate: 22, subtotal: 0, taxAmount: 0, discount: 0, total: 0
-  };
+  });
+  private http = inject(HttpClient);
+  private authService = inject(Auth);
 
-  /**
-   * SIGNAL DELLO STATO: contiene il preventivo correntemente aperto.
-   */
-  invoice = signal<InvoiceData>(this.initialData);
+  // 1. INIZIALIZZAZIONE SICURA DEL SIGNAL
+  // Inizializziamo il signal con un oggetto base per evitare che l'HTML vada in errore
+  private apiUrl = 'http://localhost:8080/api/preventivi';
+
+  constructor() {
+    // 2. IL COSTRUTTORE ESEGUE LA PRECOMPILAZIONE
+    // Appena il servizio viene creato (e authService è sicuramente pronto),
+    // aggiorniamo il preventivo con i dati dell'utente chiamando resetInvoice().
+    this.resetInvoice();
+  }
 
   ottieniProssimoNumero() {
     const utenteLoggato = this.authService.getUtenteLoggato();
@@ -191,7 +194,8 @@ export class PreventiviService {
 
   resetInvoice() {
     this.originalInvoiceNumber = null;
-    this.invoice.set({...this.initialData});
+    // Ora usiamo il metodo sicuro che pesca i dati freschi dell'utente
+    this.invoice.set(this.creaDatiIniziali());
   }
 
   /**
@@ -202,6 +206,35 @@ export class PreventiviService {
   caricaPreventivoPerModifica(prev: InvoiceData) {
     this.originalInvoiceNumber = prev.invoiceNumber;
     this.invoice.set(JSON.parse(JSON.stringify(prev)));
+  }
+
+  /**
+   * Genera un preventivo vuoto ma precompilato con i dati dell'utente loggato
+   */
+  private creaDatiIniziali(): InvoiceData {
+    let utente = null;
+    try {
+      // Recuperiamo i dati dell'utente in modo sicuro
+      utente = this.authService.getUtenteLoggato();
+    } catch (error) {
+      console.error("Errore nel recupero dei dati utente", error);
+    }
+
+    return {
+      invoiceNumber: null,
+      date: new Date().toISOString().split('T')[0], // Data di oggi (YYYY-MM-DD)
+
+      // PRECOMPILAZIONE AUTOMATICA:
+      // Se esiste nomeAzienda usa quello, altrimenti usa il nome normale, altrimenti vuoto
+      fromName: utente?.nomeAzienda || utente?.nome || '',
+      fromEmail: utente?.email || '',
+      fromPiva: utente?.partitaIva || '',
+
+      // Il resto rimane vuoto
+      toName: '', toEmail: '', toPiva: '',
+      items: [{id: Date.now().toString(), description: '', unitaMisura: 'pz', quantity: 1, rate: 0, amount: 0}],
+      taxRate: 22, subtotal: 0, taxAmount: 0, discount: 0, total: 0
+    };
   }
 
   /**
