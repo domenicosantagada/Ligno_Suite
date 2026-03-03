@@ -196,9 +196,18 @@ export class Preventivi implements OnInit {
 
     // Se lo troviamo, usiamo la libreria html2pdf per convertirlo in PDF e scaricarlo.
     if (element) {
-      // Nome dinamico del file basato sul numero del preventivo oppure un nome di default se il numero non è presente
-      const fileName = this.invoice().invoiceNumber ? `Preventivo_${this.invoice().invoiceNumber}.pdf` : 'Preventivo_ND.pdf';
 
+      const invoice = this.invoice();
+
+      const numero = invoice.invoiceNumber ?? 'ND';
+
+      const nomePulito = (invoice.toName || 'SenzaNome')
+        .trim()
+        .replace(/\s+/g, '_')           // spazi → underscore
+        .replace(/[^\w\-]/g, '');       // rimuove caratteri non validi
+
+
+      const fileName = `PREV_${numero}_${nomePulito}.pdf`;
       // Opzioni di configurazione per la libreria html2pdf
       const opt: any = {
         margin: [0, 0, 0, 0],
