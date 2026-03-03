@@ -134,7 +134,7 @@
           </label>
           <input (ngModelChange)="aggiornaCampoForm('nome', $event)"
                  [ngModel]="clienteCorrente().nome"
-                 class="form-control bg-light border-0"
+                 class="form-control bg-light border-0 text-capitalize"
                  placeholder="Es. Mario Rossi S.r.l."
                  type="text">
         </div>
@@ -145,7 +145,7 @@
           </label>
           <input (ngModelChange)="aggiornaCampoForm('email', $event)"
                  [ngModel]="clienteCorrente().email"
-                 class="form-control bg-light border-0"
+                 class="form-control bg-light border-0 text-lowercase"
                  type="email">
         </div>
 
@@ -155,7 +155,7 @@
           </label>
           <input (ngModelChange)="aggiornaCampoForm('telefono', $event)"
                  [ngModel]="clienteCorrente().telefono"
-                 class="form-control bg-light border-0"
+                 class="form-control bg-light border-0 "
                  type="text">
         </div>
 
@@ -165,7 +165,7 @@
           </label>
           <input (ngModelChange)="aggiornaCampoForm('partitaIva', $event)"
                  [ngModel]="clienteCorrente().partitaIva"
-                 class="form-control bg-light border-0"
+                 class="form-control bg-light border-0 text-uppercase"
                  type="text">
         </div>
 

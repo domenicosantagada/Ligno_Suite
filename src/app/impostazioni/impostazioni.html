@@ -54,7 +54,7 @@
             <input (ngModelChange)="updateProfilo({nomeAzienda: $event})"
                    [class.is-invalid]="!profilo().nomeAzienda"
                    [ngModel]="profilo().nomeAzienda"
-                   class="form-control" placeholder="Es. Falegnameria Rossi" type="text">
+                   class="form-control text-capitalize" placeholder="Es. Falegnameria Rossi" type="text">
 
             @if (!profilo().nomeAzienda) {
               <div class="invalid-feedback">Il nome dell'azienda è obbligatorio.</div>
@@ -66,7 +66,7 @@
 
             <label class="form-label text-muted small mb-1">Partita IVA</label>
             <input (ngModelChange)="updateProfilo({partitaIva: $event})" [ngModel]="profilo().partitaIva"
-                   class="form-control" type="text">
+                   class="form-control text-uppercase" type="text">
 
           </div>
 
@@ -74,7 +74,7 @@
 
             <label class="form-label text-muted small mb-1">Codice Fiscale</label>
             <input (ngModelChange)="updateProfilo({codiceFiscale: $event})" [ngModel]="profilo().codiceFiscale"
-                   class="form-control" type="text">
+                   class="form-control text-uppercase" type="text">
           </div>
 
           <div class="col-md-6">
@@ -82,7 +82,7 @@
             <input (ngModelChange)="updateProfilo({email: $event}); erroreEmail = ''"
                    [class.is-invalid]="!profilo().email || erroreEmail"
                    [ngModel]="profilo().email"
-                   class="form-control" type="email">
+                   class="form-control text-lowercase" type="email">
 
             @if (!profilo().email) {
               <div class="invalid-feedback">L'email aziendale è obbligatoria.</div>
@@ -107,23 +107,25 @@
           <div class="col-md-12">
             <label class="form-label text-muted small mb-1">Indirizzo (Via/Piazza e numero)</label>
             <input (ngModelChange)="updateProfilo({indirizzo: $event})" [ngModel]="profilo().indirizzo"
-                   class="form-control" type="text">
+                   class="form-control text-capitalize" type="text">
           </div>
 
           <div class="col-md-5">
             <label class="form-label text-muted small mb-1">Città</label>
-            <input (ngModelChange)="updateProfilo({citta: $event})" [ngModel]="profilo().citta" class="form-control"
+            <input (ngModelChange)="updateProfilo({citta: $event})" [ngModel]="profilo().citta"
+                   class="form-control text-capitalize"
                    type="text">
           </div>
           <div class="col-md-3">
             <label class="form-label text-muted small mb-1">CAP</label>
-            <input (ngModelChange)="updateProfilo({cap: $event})" [ngModel]="profilo().cap" class="form-control"
+            <input (ngModelChange)="updateProfilo({cap: $event})" [ngModel]="profilo().cap"
+                   class="form-control text-uppercase"
                    type="text">
           </div>
           <div class="col-md-4">
             <label class="form-label text-muted small mb-1">Provincia (Sigla)</label>
             <input (ngModelChange)="updateProfilo({provincia: $event})" [ngModel]="profilo().provincia"
-                   class="form-control" maxlength="2" placeholder="Es. RM" type="text">
+                   class="form-control text-uppercase" maxlength="2" placeholder="Es. RM" type="text">
           </div>
         </div>
       </div>
@@ -134,12 +136,12 @@
           <div class="col-md-6">
             <label class="form-label text-muted small mb-1">Nome</label>
             <input (ngModelChange)="updateProfilo({nomeTitolare: $event})" [ngModel]="profilo().nomeTitolare"
-                   class="form-control" type="text">
+                   class="form-control text-capitalize" type="text">
           </div>
           <div class="col-md-6">
             <label class="form-label text-muted small mb-1">Cognome</label>
             <input (ngModelChange)="updateProfilo({cognomeTitolare: $event})" [ngModel]="profilo().cognomeTitolare"
-                   class="form-control" type="text">
+                   class="form-control text-capitalize" type="text">
           </div>
         </div>
       </div>
