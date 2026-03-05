@@ -5,6 +5,7 @@ import {InvoiceData} from '../preventivi/preventivi.model';
 // Router: Serve per far "viaggiare" l'utente da una pagina all'altra via codice
 import {Router} from '@angular/router';
 import {PreventiviService} from '../preventivi/preventivi.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-lista-preventivi',
@@ -114,22 +115,41 @@ export class ListaPreventivi implements OnInit {
      ========================================================================== */
 
   eliminaPreventivo(preventivo: InvoiceData) {
-    // Controllo di sicurezza: se non ha un ID di database, non possiamo eliminarlo
     if (!preventivo.id) return;
 
-    // Chiediamo conferma all'utente usando la funzione nativa 'confirm' del browser.
-    if (confirm(`Sei sicuro di voler eliminare il preventivo N° ${preventivo.invoiceNumber}?`)) {
-
-      // Facciamo la chiamata DELETE al backend passando l'ID univoco del database
-      this.preventiviService.eliminaPreventivoDalDb(preventivo.id).subscribe({
-        next: () => {
-          // Se il backend ha eliminato il record con successo,
-          // lo togliamo anche dalla grafica senza ricaricare la pagina (Single Page Application!).
-          // update() modifica il Signal filtrando via l'elemento appena cancellato.
-          this.preventivi.update(list => list.filter(p => p.id !== preventivo.id));
-        },
-        error: (err) => console.error('Errore durante l\'eliminazione:', err)
-      });
-    }
+    Swal.fire({
+      title: 'Sei sicuro?',
+      text: `Vuoi davvero eliminare il preventivo N° ${preventivo.invoiceNumber}? L'azione è irreversibile.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sì, elimina',
+      cancelButtonText: 'Annulla',
+      reverseButtons: true, // Mette il tasto "Annulla" a sinistra e "Elimina" a destra
+      customClass: {
+        confirmButton: 'btn btn-danger px-4 rounded-pill ms-2',
+        cancelButton: 'btn btn-outline-secondary px-4 rounded-pill'
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      // Se l'utente clicca "Sì, elimina"
+      if (result.isConfirmed) {
+        this.preventiviService.eliminaPreventivoDalDb(preventivo.id!).subscribe({
+          next: () => {
+            this.preventivi.update(list => list.filter(p => p.id !== preventivo.id));
+            Swal.fire({
+              title: 'Eliminato!',
+              text: 'Il preventivo è stato eliminato.',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            });
+          },
+          error: (err) => {
+            console.error('Errore durante l\'eliminazione:', err);
+            Swal.fire('Errore', 'Impossibile eliminare il preventivo.', 'error');
+          }
+        });
+      }
+    });
   }
 }

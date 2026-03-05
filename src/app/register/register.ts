@@ -4,6 +4,7 @@ import {CommonModule} from '@angular/common';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
 import {Auth} from '../auth/auth';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -47,9 +48,11 @@ export class Register {
 
         // Se il backend risponde con "OK" (Status 200/201)
         next: () => {
-          // Avvisiamo l'utente e lo rimandiamo alla pagina di login
-          alert('Registrazione completata! Ora puoi fare il login.');
-          this.router.navigate(['/login']);
+          // Aspettiamo che l'utente legga il messaggio e clicchi OK prima di cambiare pagina
+          Swal.fire('Benvenuto!', 'Registrazione completata! Ora puoi fare il login.', 'success')
+            .then(() => {
+              this.router.navigate(['/login']);
+            });
         },
 
         // Se il backend risponde con un Errore (es. Status 400 o 409)

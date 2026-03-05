@@ -3,6 +3,7 @@ import {InvoiceData, InvoiceItem} from './preventivi.model';
 import {HttpClient} from '@angular/common/http';
 import {Auth} from '../auth/auth';
 import {debounceTime, Subject} from 'rxjs';
+import Swal from 'sweetalert2';
 
 /**
  * SERVIZIO PREVENTIVI
@@ -134,12 +135,12 @@ export class PreventiviService {
     const data = this.invoice();
 
     if (!data.invoiceNumber || data.invoiceNumber <= 0) {
-      alert('Errore: Inserire un numero di preventivo valido.');
+      Swal.fire('Attenzione', 'Inserire un numero di preventivo valido.', 'warning');
       return;
     }
 
     if (!data.toName || data.toName.trim() === '') {
-      alert('Errore: Inserire il nome del cliente.');
+      Swal.fire('Attenzione', 'Inserire il nome del cliente.', 'warning');
       return;
     }
 
@@ -166,35 +167,41 @@ export class PreventiviService {
     }
 
     if (isUpdate && preventivoDaSalvare.id !== undefined) {
-      // ---> MODALITÀ MODIFICA (PUT)
       this.http.put<InvoiceData>(`${this.apiUrl}/${preventivoDaSalvare.id}`, preventivoDaSalvare).subscribe({
         next: () => {
-          alert('Preventivo aggiornato con successo!');
-
-          // torna la nuvoletta verde!
+          Swal.fire({
+            title: 'Aggiornato!',
+            text: 'Preventivo aggiornato con successo!',
+            icon: 'success',
+            timer: 1000, // Si chiude da solo dopo 1.5 secondi!
+            showConfirmButton: false
+          });
           this.hasUnsavedChanges.set(false);
         },
         error: (err) => {
-          alert('Errore durante l\'aggiornamento: ' + (err.error?.message || 'Errore generico'));
+          Swal.fire('Errore', 'Errore durante l\'aggiornamento: ' + (err.error?.message || 'Errore generico'), 'error');
           console.error(err);
         }
       });
     } else {
-      // ---> MODALITÀ CREAZIONE O "SALVA CON NOME" (POST)
       this.http.post<InvoiceData>(this.apiUrl, preventivoDaSalvare).subscribe({
         next: (rispostaDb: any) => {
-          alert('Nuovo preventivo salvato con successo!');
-          this.originalInvoiceNumber = preventivoDaSalvare.invoiceNumber; // Il nuovo numero diventa l'originale
+          Swal.fire({
+            title: 'Salvato!',
+            text: 'Nuovo preventivo salvato con successo!',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          });
+          this.originalInvoiceNumber = preventivoDaSalvare.invoiceNumber;
           this.invoice.update(current => ({...current, id: rispostaDb.id}));
-
-          // torna la nuvoletta verde!
           this.hasUnsavedChanges.set(false);
         },
         error: (err) => {
           if (err.status === 409) {
-            alert('Errore: Il numero preventivo "' + preventivoDaSalvare.invoiceNumber + '" è già utilizzato.');
+            Swal.fire('Numero duplicato', 'Il numero preventivo "' + preventivoDaSalvare.invoiceNumber + '" è già utilizzato.', 'warning');
           } else {
-            alert('Errore durante il salvataggio: ' + (err.error?.message || 'Errore generico'));
+            Swal.fire('Errore', 'Errore durante il salvataggio: ' + (err.error?.message || 'Errore generico'), 'error');
           }
           console.error(err);
         }
@@ -222,6 +229,7 @@ export class PreventiviService {
     this.originalInvoiceNumber = null;
     // Ora usiamo il metodo sicuro che pesca i dati freschi dell'utente
     this.invoice.set(this.creaDatiIniziali());
+    this.hasUnsavedChanges.set(false);
   }
 
   /**
@@ -232,6 +240,7 @@ export class PreventiviService {
   caricaPreventivoPerModifica(prev: InvoiceData) {
     this.originalInvoiceNumber = prev.invoiceNumber;
     this.invoice.set(JSON.parse(JSON.stringify(prev)));
+    this.hasUnsavedChanges.set(false);
   }
 
   /**

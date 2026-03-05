@@ -7,9 +7,9 @@ import {PreventiviService} from './preventivi.service';
 import {RubricaService} from '../rubrica/rubrica.service';
 import {Cliente} from '../rubrica/rubrica';
 import {Auth} from '../auth/auth';
-import Swal from 'sweetalert2';
 // Libreria esterna per convertire un pezzo di pagina HTML in un file PDF scaricabile
 import html2pdf from 'html2pdf.js';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-preventivi',
@@ -138,24 +138,16 @@ export class Preventivi implements OnInit {
    * Se restituisce true, lo fa uscire; se false, lo blocca sulla pagina.
    */
   async puoAbbandonarePagina(): Promise<boolean> {
-    const inv = this.invoice();
-
-    // Controlliamo se ha scritto qualcosa
-    const haDati =
-      inv.toName !== '' ||
-      inv.fromName !== '' ||
-      (inv.items.length > 0 && inv.items[0].description !== '');
-
-    // Se è vuoto, può uscire tranquillamente
-    if (!haDati) {
+    // 1. Se NON ci sono modifiche non salvate (nuvoletta verde), esci subito
+    if (!this.preventiviService.hasUnsavedChanges()) {
       this.preventiviService.resetInvoice();
       return true;
     }
 
-    // Se ci sono dati, mostriamo il popup customizzato SweetAlert
+    // 2. Se ci SONO modifiche non salvate (nuvoletta rossa), mostriamo l'avviso
     const result = await Swal.fire({
       title: 'Vuoi uscire dalla pagina?',
-      text: 'I dati che non hai salvato andranno persi.',
+      text: 'Ci sono modifiche non salvate che andranno perse.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sì, esci',
@@ -163,7 +155,6 @@ export class Preventivi implements OnInit {
       reverseButtons: true,
       focusConfirm: false,
       focusCancel: false,
-      // Trucco per togliere la selezione automatica dai bottoni appena il popup appare
       didOpen: () => {
         (document.activeElement as HTMLElement)?.blur();
       },
@@ -176,10 +167,10 @@ export class Preventivi implements OnInit {
     });
 
     if (result.isConfirmed) {
-      this.preventiviService.resetInvoice(); // Pulisce i dati prima di andarsene
-      return true;
+      this.preventiviService.resetInvoice(); // Pulisce i dati
+      return true; // L'utente conferma di voler perdere le modifiche
     } else {
-      return false; // L'utente ha deciso di restare
+      return false; // L'utente resta per salvare
     }
   }
 

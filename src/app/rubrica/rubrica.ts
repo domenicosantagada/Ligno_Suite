@@ -2,6 +2,7 @@ import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {RubricaService} from './rubrica.service';
+import Swal from 'sweetalert2';
 
 /**
  * INTERFACCIA CLIENTE
@@ -133,26 +134,59 @@ export class Rubrica implements OnInit {
         this.caricaClienti();
         // E torniamo alla schermata della tabella
         this.mostraForm.set(false);
+        // Mostriamo un messaggio di successo (usando SweetAlert2)
+        Swal.fire({
+          title: 'Salvato!',
+          text: 'Cliente salvato in rubrica.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
       },
       error: (err) => {
-        alert('Errore durante il salvataggio del cliente.');
+        // Mostriamo un messaggio di errore (usando SweetAlert2)
+        Swal.fire('Errore', 'Errore durante il salvataggio del cliente.', 'error');
         console.error(err);
       }
     });
   }
 
+
   eliminaCliente(id?: number | string) {
     if (!id) return;
 
-    // Chiede conferma prima di eseguire un'azione distruttiva
-    if (confirm('Sei sicuro di voler eliminare questo cliente?')) {
-      this.rubricaService.eliminaClienteDalDb(id).subscribe({
-        next: () => {
-          // Se eliminato con successo, ricarica la lista per farlo sparire dalla tabella
-          this.caricaClienti();
-        },
-        error: (err) => console.error('Errore durante l\'eliminazione:', err)
-      });
-    }
+    Swal.fire({
+      title: 'Eliminare cliente?',
+      text: 'Questa azione non può essere annullata.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sì, elimina',
+      cancelButtonText: 'Annulla',
+      reverseButtons: true,
+      customClass: {
+        confirmButton: 'btn btn-danger px-4 rounded-pill ms-2',
+        cancelButton: 'btn btn-outline-secondary px-4 rounded-pill'
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.rubricaService.eliminaClienteDalDb(id).subscribe({
+          next: () => {
+            this.caricaClienti();
+            Swal.fire({
+              title: 'Eliminato!',
+              text: 'Cliente rimosso dalla rubrica.',
+              icon: 'success',
+              timer: 1000,
+              showConfirmButton: false
+            });
+          },
+          error: (err) => {
+            console.error('Errore durante l\'eliminazione:', err);
+            Swal.fire('Errore', 'Impossibile eliminare il cliente.', 'error');
+          }
+        });
+      }
+    });
   }
 }
