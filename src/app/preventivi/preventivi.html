@@ -4,6 +4,15 @@
     <h2 class="mb-0">Gestione Preventivi</h2>
     <div>
 
+      <!-- Icona della nuvola con spunta o con freccia verso l'alto a seconda se ci sono modifiche non salvate o no -->
+      <div class="me-3 fs-4">
+        @if (preventiviService.hasUnsavedChanges()) {
+          <i class="bi bi-cloud-arrow-up-fill text-danger" title="Modifiche non salvate"></i>
+        } @else {
+          <i class="bi bi-cloud-check-fill text-success" title="Tutte le modifiche sono salvate"></i>
+        }
+      </div>
+
       <!-- BOTTONE ANTEPRIMA / SALVA -->
       <!-- Se siamo in modalità anteprima, mostriamo i pulsanti per tornare alla modifica e scaricare il PDF -->
       @if (isPreview()) {

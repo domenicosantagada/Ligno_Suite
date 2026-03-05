@@ -2,6 +2,7 @@ import {inject, Injectable, signal} from '@angular/core';
 import {InvoiceData, InvoiceItem} from './preventivi.model';
 import {HttpClient} from '@angular/common/http';
 import {Auth} from '../auth/auth';
+import {debounceTime, Subject} from 'rxjs';
 
 /**
  * SERVIZIO PREVENTIVI
@@ -24,18 +25,28 @@ export class PreventiviService {
     items: [{id: Date.now().toString(), description: '', unitaMisura: 'pz', quantity: 1, rate: 0, amount: 0}],
     taxRate: 22, subtotal: 0, taxAmount: 0, discount: 0, total: 0
   });
+
+  //  Signal per gestire l'icona, serve per tenere traccia se ci sono modifiche non salvate.
+  hasUnsavedChanges = signal(false);
+
   private http = inject(HttpClient);
   private authService = inject(Auth);
-
-  // 1. INIZIALIZZAZIONE SICURA DEL SIGNAL
-  // Inizializziamo il signal con un oggetto base per evitare che l'HTML vada in errore
   private apiUrl = 'http://localhost:8080/api/preventivi';
+  // creaiamo un subject per il salvataggio automatico
+  private autoSaveSubject = new Subject<void>();
 
   constructor() {
     // 2. IL COSTRUTTORE ESEGUE LA PRECOMPILAZIONE
     // Appena il servizio viene creato (e authService è sicuramente pronto),
     // aggiorniamo il preventivo con i dati dell'utente chiamando resetInvoice().
     this.resetInvoice();
+
+    // ascolto del salvataggio automatico, dopo 1 minuto si attiva automaticamente
+    this.autoSaveSubject.pipe(
+      debounceTime(60000)
+    ).subscribe(() => {
+      this.eseguiAutoSalvataggioSilenzioso();
+    });
   }
 
   ottieniProssimoNumero() {
@@ -72,6 +83,12 @@ export class PreventiviService {
 
       return newInvoice;
     });
+
+    // Segnala che ci sono modifiche non salvate (nuvoletta rossa)
+    this.hasUnsavedChanges.set(true);
+
+    // 2. Lancia il trigger per l'autosalvataggio (implementato prima)
+    this.autoSaveSubject.next();
   }
 
   addItem() {
@@ -253,5 +270,50 @@ export class PreventiviService {
     const total = (subtotal + taxAmount) - discountVal;
 
     return {subtotal, taxAmount, total};
+  }
+
+// Metodo per salvare automaticamente il preventivo in modo silenzioso
+  private eseguiAutoSalvataggioSilenzioso() {
+    const data = this.invoice();
+
+    // Validazione silenziosa: se mancano i dati minimi, ignoriamo il salvataggio
+    if (!data.invoiceNumber || data.invoiceNumber <= 0) return;
+    if (!data.toName || data.toName.trim() === '') return;
+
+    const preventivoDaSalvare = JSON.parse(JSON.stringify(data));
+    const utenteLoggato = this.authService.getUtenteLoggato();
+    if (utenteLoggato) preventivoDaSalvare.utenteId = utenteLoggato.id;
+
+    const isUpdate = this.originalInvoiceNumber && (this.originalInvoiceNumber === preventivoDaSalvare.invoiceNumber);
+
+    // Gestione id righe
+    if (this.originalInvoiceNumber && this.originalInvoiceNumber !== preventivoDaSalvare.invoiceNumber) {
+      preventivoDaSalvare.items.forEach((item: any, index: number) => {
+        item.id = Date.now().toString() + '-' + index;
+      });
+    }
+
+    if (isUpdate && preventivoDaSalvare.id) {
+      this.http.put<InvoiceData>(`${this.apiUrl}/${preventivoDaSalvare.id}`, preventivoDaSalvare).subscribe({
+        next: () => {
+          console.log('Auto-salvataggio: preventivo aggiornato.');
+          // Torna la nuvoletta verde!
+          this.hasUnsavedChanges.set(false);
+        },
+        error: (err) => console.error('Errore auto-salvataggio', err)
+      });
+    } else {
+      this.http.post<InvoiceData>(this.apiUrl, preventivoDaSalvare).subscribe({
+        next: (rispostaDb: any) => {
+          console.log('Auto-salvataggio: nuovo preventivo creato.');
+          this.originalInvoiceNumber = rispostaDb.invoiceNumber;
+          this.invoice.update(current => ({...current, id: rispostaDb.id}));
+
+          // Torna la nuvoletta verde!
+          this.hasUnsavedChanges.set(false);
+        },
+        error: (err) => console.error('Errore auto-salvataggio creazione', err)
+      });
+    }
   }
 }
