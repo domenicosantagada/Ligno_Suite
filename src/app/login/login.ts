@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {ChangeDetectorRef, Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 // Moduli necessari per creare e validare il form lato codice (Reactive Forms)
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -20,7 +20,6 @@ export class Login {
 
   // FormBuilder: strumento di Angular per configurare il form in modo rapido
   private fb = inject(FormBuilder);
-
   // Creazione del form e delle sue regole di validazione
   loginForm = this.fb.group({
     // L'email parte vuota (''), è obbligatoria e deve avere il formato @...
@@ -29,6 +28,8 @@ export class Login {
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
+  // il ChangeDetectorRef serve per rilevare le modifiche e aggiornare l'interfaccia'
+  private cdr = inject(ChangeDetectorRef);
   // Router: serve per cambiare pagina via codice
   private router = inject(Router);
 
@@ -57,6 +58,9 @@ export class Login {
         // Se il server rifiuta le credenziali (errore)
         error: () => {
           this.errore = 'Email o password errati.';
+
+          // In questo modo forziamo il rilevamento delle modifiche per aggiornare l'interfaccia's
+          this.cdr.detectChanges();
         }
       });
     }

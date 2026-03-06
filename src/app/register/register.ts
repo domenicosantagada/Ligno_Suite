@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {ChangeDetectorRef, Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 // Moduli per i Reactive Forms (form gestiti lato codice)
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -36,6 +36,9 @@ export class Register {
   private router = inject(Router);
   private authService = inject(Auth);
 
+  // Il ChangeDetectorRef serve per rilevare le modifiche e aggiornare l'interfaccia'
+  private cdr = inject(ChangeDetectorRef);
+
   /**
    * Metodo richiamato quando l'utente preme "Registrati"
    */
@@ -60,6 +63,8 @@ export class Register {
           // Leggiamo il messaggio di errore specifico mandato dal backend (es. "Email già presente")
           // Se non c'è un messaggio specifico (err.error?.message), usiamo un testo generico.
           this.errore = err.error?.message || 'Errore durante la registrazione.';
+
+          this.cdr.detectChanges(); // Aggiorna l'interfaccia per mostrare l'errore a schermo
         }
       });
     }
