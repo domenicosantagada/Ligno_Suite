@@ -238,13 +238,15 @@ export class Preventivi implements OnInit {
         this.preventiviService.updateItem(index, 'description', res.descrizioneMigliorata);
         this.rigaInGenerazioneIA = -1; // Spegne lo spinner
 
+        /* popup per notificare il successo della modifica
         const Toast = Swal.mixin({
           toast: true,
           position: 'bottom-end',
           showConfirmButton: false,
           timer: 3000
         });
-        Toast.fire({icon: 'success', title: 'Descrizione migliorata con IA! ✨'});
+        Toast.fire({icon: 'success', title: 'Descrizione migliorata con IA!'});
+         */
       },
       error: (err) => {
         console.error(err);

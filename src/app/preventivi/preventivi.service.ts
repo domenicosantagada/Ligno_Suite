@@ -56,7 +56,12 @@ export class PreventiviService {
 
     this.http.get<number>(`${this.apiUrl}/next-number?utenteId=${utenteLoggato.id}`).subscribe({
       next: (nextNum) => {
-        this.updateInvoice({invoiceNumber: nextNum});
+        // vecchia versione che chiamava il metodo updateInvoice() e faceva scattare la nuvoletta rossa (hasUnsavedChanges)
+        //this.updateInvoice({invoiceNumber: nextNum});
+
+        // Modifichiamo direttamente il Signal senza chiamare this.updateInvoice()
+        // In questo modo NON scatta la nuvoletta rossa (hasUnsavedChanges)
+        this.invoice.update(current => ({...current, invoiceNumber: nextNum}));
       },
       error: (err) => console.error('Errore durante il calcolo del progressivo:', err)
     });
