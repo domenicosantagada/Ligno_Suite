@@ -97,19 +97,33 @@
 
     <div class="table-responsive">
       <table class="table align-middle mb-0">
+
         <thead class="bg-light">
         <tr>
-          <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="letter-spacing: 1px;">Materiale</th>
-          <th class="py-3 text-uppercase small fw-bold text-muted" style="letter-spacing: 1px;">Fornitore</th>
-          <th class="py-3 text-uppercase small fw-bold text-muted text-center" style="letter-spacing: 1px;">Data
-            Acquisto
+          <th class="ps-4 py-3 text-uppercase small fw-bold text-muted"
+              style="width: 35%; letter-spacing: 1px;">
+            Materiale
           </th>
-          <th class="py-3 text-uppercase small fw-bold text-muted text-end" style="letter-spacing: 1px;">Prezzo</th>
-          <th class="pe-4 py-3 text-uppercase small fw-bold text-muted text-center" style="letter-spacing: 1px;">
+
+          <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 24%; letter-spacing: 1px;">
+            Fornitore
+          </th>
+
+          <th class="py-3 text-uppercase small fw-bold text-muted text-center" style="width: 14%; letter-spacing: 1px;">
+            Data Acquisto
+          </th>
+
+          <th class="py-3 text-uppercase small fw-bold text-muted text-end" style="width: 13%; letter-spacing: 1px;">
+            Prezzo
+          </th>
+
+          <th class="pe-4 py-3 text-uppercase small fw-bold text-muted text-center"
+              style="width: 14%; letter-spacing: 1px;">
             Azioni
           </th>
         </tr>
         </thead>
+
         <tbody>
           @for (articolo of articoliFiltrati(); track articolo.id) {
             <tr class="hover-row">
