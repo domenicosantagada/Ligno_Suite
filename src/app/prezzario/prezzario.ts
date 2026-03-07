@@ -126,7 +126,6 @@ export class Prezzario implements OnInit {
           // Sostituisce la riga vecchia con la nuova nel Signal
           this.articoli.update(lista => lista.map(art => art.id === articoloAggiornato.id ? articoloAggiornato : art));
           this.chiudiForm();
-          this.toastSuccesso('Articolo aggiornato!');
         },
         error: (err) => {
           console.error('Errore modifica:', err);
@@ -140,7 +139,6 @@ export class Prezzario implements OnInit {
           // Aggiunge la nuova riga in cima alla tabella istantaneamente
           this.articoli.update(lista => [nuovoArticolo, ...lista]);
           this.chiudiForm();
-          this.toastSuccesso('Articolo aggiunto al prezzario!');
         },
         error: (err) => {
           console.error('Errore aggiunta:', err);
@@ -166,7 +164,6 @@ export class Prezzario implements OnInit {
           next: () => {
             // Rimuove la riga dalla tabella istantaneamente senza ricaricare dal DB
             this.articoli.update(lista => lista.filter(art => art.id !== articolo.id));
-            this.toastSuccesso('Articolo eliminato');
           },
           error: (err) => {
             console.error('Errore eliminazione:', err);
@@ -176,17 +173,4 @@ export class Prezzario implements OnInit {
       }
     });
   }
-
-  // Metodo per il popup "silenzioso" in basso a destra
-  private toastSuccesso(messaggio: string) {
-    Swal.fire({
-      toast: true,
-      position: 'bottom-end',
-      showConfirmButton: false,
-      timer: 3000,
-      icon: 'success',
-      title: messaggio
-    });
-  }
-
 }
