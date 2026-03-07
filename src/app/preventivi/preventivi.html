@@ -22,6 +22,9 @@
         <button (click)="downloadPDF()" class="btn btn-primary">
           <i class="bi bi-download"></i> Scarica PDF
         </button>
+        <button (click)="inviaPDFPerEmail()" class="btn btn-outline-primary">
+          <i class="bi bi-envelope"></i> Invia via Email
+        </button>
       } @else {
         <!-- Se non siamo in modalità anteprima, mostriamo i pulsanti per visualizzare l'anteprima e salvare il preventivo -->
         <button (click)="togglePreview()" class="btn btn-dark btn-sm px-4 rounded-pill me-2">
