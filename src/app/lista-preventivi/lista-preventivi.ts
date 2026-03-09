@@ -2,7 +2,6 @@ import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {InvoiceData} from '../preventivi/preventivi.model';
-// Router: Serve per far "viaggiare" l'utente da una pagina all'altra via codice
 import {Router} from '@angular/router';
 import {PreventiviService} from '../preventivi/preventivi.service';
 import Swal from 'sweetalert2';
@@ -35,16 +34,12 @@ export class ListaPreventivi implements OnInit {
 
   /**
    * COMPUTED SIGNAL (Signal Calcolato)
-   * Questa è una delle funzioni più potenti di Angular 16+.
    * 'filteredPreventivi' non viene modificato a mano. Si ricalcola DA SOLO e in automatico
    * ogni volta che cambia 'preventivi' o cambia 'searchTerm'.
-   * Se scrivi "Mario" nella barra di ricerca, Angular esegue subito questo blocco di codice.
    */
   filteredPreventivi = computed(() => {
-    // 1. Prendiamo il termine di ricerca e lo mettiamo tutto in minuscolo per una ricerca "case-insensitive"
     const term = this.searchTerm().toLowerCase();
 
-    // 2. Filtriamo l'array originale
     return this.preventivi().filter(p =>
       // Cerchiamo sia nel numero del preventivo (convertito in stringa)...
       (p.invoiceNumber && p.invoiceNumber.toString().includes(term)) ||

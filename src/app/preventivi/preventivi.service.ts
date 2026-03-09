@@ -38,7 +38,7 @@ export class PreventiviService {
 
   constructor() {
     // 2. IL COSTRUTTORE ESEGUE LA PRECOMPILAZIONE
-    // Appena il servizio viene creato (e authService è sicuramente pronto),
+    // Appena il servizio viene creato
     // aggiorniamo il preventivo con i dati dell'utente chiamando resetInvoice().
     this.resetInvoice();
 
@@ -156,7 +156,7 @@ export class PreventiviService {
     // È una MODIFICA vera e propria solo se l'ID originario coincide con quello attuale.
     const isUpdate = this.originalInvoiceNumber && (this.originalInvoiceNumber === preventivoDaSalvare.invoiceNumber);
 
-    // LOGICA "SALVA CON NOME":
+    // LOGICA Salvataggio:
     // L'utente aveva aperto il prev. N°10, ma ha cambiato il numero in 11 per farne uno nuovo.
     // Dobbiamo rigenerare gli ID delle singole righe, altrimenti Hibernate/Spring Boot andrà in errore
     // per violazione di chiavi primarie duplicate.
@@ -308,7 +308,7 @@ export class PreventiviService {
     return {subtotal, taxAmount, total};
   }
 
-// Metodo per salvare automaticamente il preventivo in modo silenzioso
+  // Metodo per salvare automaticamente il preventivo in modo silenzioso
   private eseguiAutoSalvataggioSilenzioso() {
     const data = this.invoice();
 
