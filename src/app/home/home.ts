@@ -20,6 +20,7 @@ export class Home implements OnInit {
   ultimoPreventivoCliente = signal<string>('');
   totaleClienti = signal<number>(0);
   preventiviUltimi30Giorni = signal<number>(0);
+
   // Iniezione dei servizi necessari
   private authService = inject(Auth);
   private preventiviService = inject(PreventiviService);
@@ -47,9 +48,11 @@ export class Home implements OnInit {
   private caricaDatiUtente() {
     const utente = this.authService.getUtenteLoggato();
     if (utente) {
-      // Diamo priorità assoluta al nome personale del titolare.
-      // Se assente, ripieghiamo sul nome azienda o su un default.
-      if (utente.nome && utente.nome.trim() !== '') {
+      // Diamo priorità assoluta al nome personale del titolare (nomeTitolare).
+      // Se assente, ripieghiamo sul nome semplice, poi sul nome azienda o su un default.
+      if (utente.nomeTitolare && utente.nomeTitolare.trim() !== '') {
+        this.nomeTitolare.set(utente.nomeTitolare);
+      } else if (utente.nome && utente.nome.trim() !== '') {
         this.nomeTitolare.set(utente.nome);
       } else if (utente.nomeAzienda && utente.nomeAzienda.trim() !== '') {
         this.nomeTitolare.set(utente.nomeAzienda);
@@ -83,7 +86,7 @@ export class Home implements OnInit {
           const trentaGiorniFa = new Date();
           trentaGiorniFa.setDate(trentaGiorniFa.getDate() - 30);
 
-          const preventiviRecenti = preventivi.filter(p => new Date(p.date) >= trentaGiorniFa);
+          const preventiviRecenti = preventivi.filter((p: any) => new Date(p.date) >= trentaGiorniFa);
           this.preventiviUltimi30Giorni.set(preventiviRecenti.length);
         } else {
           // Fallback se il database è vuoto
