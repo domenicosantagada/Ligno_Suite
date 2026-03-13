@@ -2,7 +2,7 @@ import {inject, Injectable, signal} from '@angular/core';
 import {InvoiceData, InvoiceItem} from './preventivi.model';
 import {HttpClient} from '@angular/common/http';
 import {Auth} from '../auth/auth';
-import {debounceTime, Subject} from 'rxjs';
+import {debounceTime, Observable, Subject} from 'rxjs';
 import Swal from 'sweetalert2';
 
 /**
@@ -56,7 +56,12 @@ export class PreventiviService {
 
     this.http.get<number>(`${this.apiUrl}/next-number?utenteId=${utenteLoggato.id}`).subscribe({
       next: (nextNum) => {
-        this.updateInvoice({invoiceNumber: nextNum});
+        // vecchia versione che chiamava il metodo updateInvoice() e faceva scattare la nuvoletta rossa (hasUnsavedChanges)
+        //this.updateInvoice({invoiceNumber: nextNum});
+
+        // Modifichiamo direttamente il Signal senza chiamare this.updateInvoice()
+        // In questo modo NON scatta la nuvoletta rossa (hasUnsavedChanges)
+        this.invoice.update(current => ({...current, invoiceNumber: nextNum}));
       },
       error: (err) => console.error('Errore durante il calcolo del progressivo:', err)
     });
@@ -259,6 +264,27 @@ export class PreventiviService {
         fromPiva: utente.partitaIva || ''
       }));
     }
+  }
+
+  /* metodo per utilizzare l'API del linguaggio AI per generare una descrizione voce preventivo accurata*/
+  miglioraDescrizioneConIA(testoBreve: string): Observable<any> {
+    return this.http.post<any>('http://localhost:8080/api/ai/genera-descrizione', {testo: testoBreve});
+  }
+
+  /**
+   * Riordina le voci tramite Drag & Drop
+   */
+  riordinaItem(daIndice: number, aIndice: number) {
+    const newItems = [...this.invoice().items];
+
+    // Rimuove l'elemento dalla sua posizione originale
+    const [itemSpostato] = newItems.splice(daIndice, 1);
+
+    // Lo inserisce nella nuova posizione
+    newItems.splice(aIndice, 0, itemSpostato);
+
+    // Aggiorna il preventivo
+    this.updateInvoice({items: newItems});
   }
 
   /**

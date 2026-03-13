@@ -20,6 +20,12 @@ import Swal from 'sweetalert2';
 })
 export class Preventivi implements OnInit {
 
+  // variabile per tenere traccia della riga in fase di generazione IA, -1 se non in fase di generazione
+  rigaInGenerazioneIA: number = -1;
+
+  // Indice della riga che si sta trascinando
+  draggedIndex: number | null = null;
+
   /* ==========================================================================
      DEPENDENCY INJECTION
      ========================================================================== */
@@ -205,7 +211,7 @@ export class Preventivi implements OnInit {
       const fileName = `PREV_${numero}_${nomePulito}.pdf`;
       // Opzioni di configurazione per la libreria html2pdf
       const opt: any = {
-        margin: [8, 8], // Margine in mm (top/bottom, left/right)
+        margin: [2, 2], // Margine in mm (top/bottom, left/right), prima dell'ai era 8,8
         filename: fileName,
         image: {type: 'jpeg', quality: 1}, // Qualità fotografica, se aumento troppo, il file diventa pesante. Max -> 1.0 min -> 0.1
         html2canvas: {scale: 14, useCORS: true}, // Scala per la renderizzazione (più alto = migliore qualità ma più lento), useCORS per caricare immagini da altre origini
@@ -218,5 +224,65 @@ export class Preventivi implements OnInit {
     } else {
       console.error("Elemento per l'anteprima del PDF non trovato!");
     }
+  }
+
+  generaDescrizioneIA(index: number) {
+    const itemCorrente = this.invoice().items[index];
+    const testoAttuale = itemCorrente.description;
+
+    if (!testoAttuale || testoAttuale.trim() === '') {
+      Swal.fire('Attenzione', 'Scrivi prima una breve descrizione da far migliorare all\'IA!', 'warning');
+      return;
+    }
+
+    this.rigaInGenerazioneIA = index; // Imposta lo spinner per questa riga specifica
+
+    this.preventiviService.miglioraDescrizioneConIA(testoAttuale).subscribe({
+      next: (res) => {
+        // Usiamo il metodo corretto del service per aggiornare la descrizione di quella specifica riga
+        this.preventiviService.updateItem(index, 'description', res.descrizioneMigliorata);
+        this.rigaInGenerazioneIA = -1; // Spegne lo spinner
+
+        /* popup per notificare il successo della modifica
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'bottom-end',
+          showConfirmButton: false,
+          timer: 3000
+        });
+        Toast.fire({icon: 'success', title: 'Descrizione migliorata con IA!'});
+         */
+      },
+      error: (err) => {
+        console.error(err);
+        this.rigaInGenerazioneIA = -1;
+        Swal.fire('Errore', 'Impossibile contattare l\'IA in questo momento.', 'error');
+      }
+    });
+  }
+
+  /* ==========================================================================
+     DRAG & DROP VOCI PREVENTIVO
+     ========================================================================== */
+
+  onDragStart(event: DragEvent, index: number) {
+    this.draggedIndex = index;
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    // Necessario per permettere il rilascio (drop)
+    event.preventDefault();
+  }
+
+  onDrop(event: DragEvent, dropIndex: number) {
+    event.preventDefault();
+    if (this.draggedIndex !== null && this.draggedIndex !== dropIndex) {
+      // Chiama il servizio per scambiare gli elementi
+      this.preventiviService.riordinaItem(this.draggedIndex, dropIndex);
+    }
+    this.draggedIndex = null;
   }
 }
