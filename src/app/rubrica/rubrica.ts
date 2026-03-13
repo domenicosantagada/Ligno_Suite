@@ -20,7 +20,7 @@ export interface Cliente {
 @Component({
   selector: 'app-rubrica',
   standalone: true,
-  imports: [CommonModule, FormsModule], // FormsModule è vitale per usare ngModel nei campi di testo
+  imports: [CommonModule, FormsModule], // FormsModule serve per usare [(ngModel)] nel template
   templateUrl: './rubrica.html',
   styleUrl: './rubrica.css',
 })
@@ -30,7 +30,7 @@ export class Rubrica implements OnInit {
   rubricaService = inject(RubricaService);
 
   /* ==========================================================================
-     STATO DEL COMPONENTE (Gestito con i Signal)
+     STATO DEL COMPONENTE
      ========================================================================== */
 
   // Lista di tutti i clienti caricati dal DB (inizialmente vuota)
@@ -108,7 +108,6 @@ export class Rubrica implements OnInit {
 
   /**
    * Aggiorna un singolo campo (es. 'nome' o 'telefono') del cliente che stiamo scrivendo.
-   * keyof Cliente garantisce che 'campo' sia esattamente una delle proprietà dell'interfaccia (es. non puoi passargli 'colore').
    */
   aggiornaCampoForm(campo: keyof Cliente, valore: string) {
     this.clienteCorrente.update(c => ({...c, [campo]: valore}));

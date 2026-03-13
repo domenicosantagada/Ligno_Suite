@@ -65,6 +65,23 @@ export class Preventivi implements OnInit {
     // Altrimenti, filtra i clienti che contengono il testo digitato
     return this.clienti().filter(c => c.nome.toLowerCase().includes(term));
   });
+  // --- VARIABILI PER LA MODALE EMAIL ---
+  mostraModalEmail = false;
+
+  /* ==========================================================================
+     LOGICA DI AUTOCOMPLETAMENTO
+     ========================================================================== */
+  emailDestinatario = '';
+  emailOggetto = '';
+
+  // Se l'utente clicca fuori dal campo di testo, dobbiamo nascondere la tendina.
+  // Usiamo setTimeout (ritardo di 200ms) perché se la nascondessimo all'istante,
+  emailMessaggio = '';
+  emailNomeFile = '';
+
+  /* ==========================================================================
+     ROUTE GUARD: PROTEZIONE USCITA PAGINA
+     ========================================================================== */
 
   /* ==========================================================================
      INIZIALIZZAZIONE COMPONENTE
@@ -104,7 +121,7 @@ export class Preventivi implements OnInit {
   }
 
   /* ==========================================================================
-     LOGICA DI AUTOCOMPLETAMENTO
+     ESPORTAZIONE PDF
      ========================================================================== */
 
   // Scatta a ogni tasto premuto nel campo di testo del nome cliente
@@ -124,8 +141,10 @@ export class Preventivi implements OnInit {
     this.mostraDropdownClienti.set(false); // Chiude la tendina
   }
 
-  // Se l'utente clicca fuori dal campo di testo, dobbiamo nascondere la tendina.
-  // Usiamo setTimeout (ritardo di 200ms) perché se la nascondessimo all'istante,
+  /* ==========================================================================
+     DRAG & DROP VOCI PREVENTIVO
+     ========================================================================== */
+
   // l'utente non farebbe in tempo a cliccare fisicamente sulla voce che gli interessa!
   nascondiDropdownRitardato() {
     setTimeout(() => {
@@ -137,10 +156,6 @@ export class Preventivi implements OnInit {
     // Inverte il valore del Signal (se era true diventa false, e viceversa)
     this.isPreview.update(v => !v);
   }
-
-  /* ==========================================================================
-     ROUTE GUARD: PROTEZIONE USCITA PAGINA
-     ========================================================================== */
 
   /**
    * Metodo chiamato dal Router di Angular se l'utente prova a cambiare pagina
@@ -184,9 +199,63 @@ export class Preventivi implements OnInit {
     }
   }
 
-  /* ==========================================================================
-     ESPORTAZIONE PDF
-     ========================================================================== */
+  /*
+  inviaPDFPerEmail() {
+    const invoice = this.invoice();
+
+    if (!invoice.toEmail || invoice.toEmail.trim() === '') {
+      Swal.fire('Attenzione', 'Inserisci l\'email del cliente prima di inviare!', 'warning');
+      return;
+    }
+
+    const element = document.getElementById('invoice-preview-container');
+    if (element) {
+      const numero = invoice.invoiceNumber ?? 'ND';
+      const nomePulito = (invoice.toName || 'SenzaNome').trim().replace(/\s+/g, '_').replace(/[^\w\-]/g, '');
+      const fileName = `PREV_${numero}_${nomePulito}.pdf`;
+
+      const opt: any = {
+        margin: [2, 2],
+        filename: fileName,
+        image: {type: 'jpeg', quality: 1},
+        html2canvas: {scale: 3, useCORS: true}, // Usa scale 3 per non far impazzire la memoria nell'invio file
+        jsPDF: {unit: 'mm', format: 'a4', orientation: 'portrait'}
+      };
+
+      // Mostra uno spinner di caricamento con Swal
+      Swal.fire({
+        title: 'Generazione e invio in corso...',
+        text: 'Attendi un istante',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Anziché .save(), usiamo .output('blob') per ottenere il file senza scaricarlo
+      html2pdf().set(opt).from(element).output('blob').then((pdfBlob: Blob) => {
+
+        const formData = new FormData();
+        formData.append('file', pdfBlob, fileName);
+        formData.append('destinatario', invoice.toEmail!);
+        formData.append('nomeCliente', invoice.toName || 'Cliente');
+
+        // Chiamata al backend
+        this.preventiviService.inviaPdfPerEmail(formData).subscribe({
+          next: (res) => {
+            Swal.fire('Inviato!', 'Il preventivo è stato inviato via email con successo.', 'success');
+          },
+          error: (err) => {
+            console.error(err);
+            Swal.fire('Errore', 'Si è verificato un problema durante l\'invio dell\'email.', 'error');
+          }
+        });
+      });
+    } else {
+      Swal.fire('Errore', 'Impossibile generare il PDF. Passa alla visualizzazione anteprima.', 'error');
+    }
+  }
+   */
 
   /**
    * Prende il contenitore HTML che fa da "Anteprima" e lo "stampa" in PDF
@@ -260,10 +329,6 @@ export class Preventivi implements OnInit {
       }
     });
   }
-
-  /* ==========================================================================
-     DRAG & DROP VOCI PREVENTIVO
-     ========================================================================== */
 
   onDragStart(event: DragEvent, index: number) {
     this.draggedIndex = index;
