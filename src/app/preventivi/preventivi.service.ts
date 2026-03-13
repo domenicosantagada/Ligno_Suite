@@ -287,6 +287,10 @@ export class PreventiviService {
     this.updateInvoice({items: newItems});
   }
 
+  inviaPdfPerEmail(formData: FormData) {
+    return this.http.post('http://localhost:8080/api/email/invia-preventivo', formData);
+  }
+
   /**
    * Genera un preventivo vuoto ma precompilato con i dati dell'utente loggato
    */
