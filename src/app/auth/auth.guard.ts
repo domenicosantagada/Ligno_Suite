@@ -22,22 +22,16 @@ export const authGuard: CanActivateFn = (route, state) => {
   if (authService.getUtenteLoggato()) {
 
     // CASO A: L'utente esiste (è loggato).
-    // Restituiamo 'true': il semaforo diventa verde e Angular carica il componente della pagina.
+    // Restituiamo true: angular carica il componente della pagina.
     return true;
 
   } else {
 
     // CASO B: L'utente NON esiste (non è loggato o ha cancellato i dati).
-
-    /**
-     * 2. IL REINDIRIZZAMENTO (Fallback)
-     * Non basta bloccare l'utente; dobbiamo portarlo in un posto sicuro.
-     * Usiamo router.navigate per rispedirlo alla pagina di login.
-     */
+    // Blocchiamo la navigazione e reindirizziamo al Login.
     router.navigate(['/login']);
 
-    // 3. IL BLOCCO
-    // Restituiamo 'false': il semaforo è rosso e la navigazione viene annullata.
+    // Restituiamo false: angular non carica il componente della pagina.
     return false;
   }
 };

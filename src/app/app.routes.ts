@@ -8,11 +8,11 @@ import {Login} from './login/login';
 import {Register} from './register/register';
 import {Rubrica} from './rubrica/rubrica';
 import {Impostazioni} from './impostazioni/impostazioni';
-import {authGuard} from './auth/auth.guard'; // 1. Importa il componente Login
+import {authGuard} from './auth/auth.guard';
 
 /**
- * array delle ROTTE. Angular legge questo array dall'alto verso il basso.
- * Appena trova una rotta che "matcha" (corrisponde) all'URL, si ferma e carica quel componente.
+ * array delle ROTTE dell'applicazione.
+ * Ogni oggetto rappresenta una rotta, con: path, componente da caricare, canActivate, etc.
  */
 export const routes: Routes = [
 
@@ -29,7 +29,7 @@ export const routes: Routes = [
 
   // --- ROTTE PRIVATE (Dashboard dell'utente) ---
   /*
-   * canActivate: [authGuard] è un "Garante" (Guard) di sicurezza.
+   * canActivate: [authGuard] è un Guard di autenticazione che protegge la rotta.
    * Prima di caricare il componente "Home", Angular esegue il codice dentro authGuard.
    * Se authGuard restituisce 'true' (l'utente ha fatto il login), lo fa passare.
    * Se restituisce 'false' (non è loggato), blocca la navigazione e di solito lo rimanda al Login.
