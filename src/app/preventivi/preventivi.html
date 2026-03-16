@@ -1,8 +1,8 @@
 <div class="container-fluid py-4">
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-5">
     <h2 class="mb-0">Gestione Preventivi</h2>
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center ">
 
       <!-- Icona della nuvola con spunta o con freccia verso l'alto a seconda se ci sono modifiche non salvate o no -->
       <div class="me-3 fs-4">
@@ -28,7 +28,7 @@
         <button (click)="downloadPDF()" class="btn btn-success me-2 rounded-pill btn-sm px-3">
           <i class="bi bi-download"></i> Scarica PDF
         </button>
-        <button (click)="apriModalEmail()" class="btn btn-warning rounded-pill btn-sm px-3">
+        <button class="btn btn-warning rounded-pill btn-sm px-3">
           <i class="bi bi-envelope"></i> Invia Email
         </button>
       } @else {
@@ -47,7 +47,7 @@
 
   <!-- SEZIONE DI MODIFICA PREVENTIVO -->
   @if (!isPreview()) {
-    <div class="card p-4 shadow-sm mb-4 border-0 bg-white">
+    <div class="card p-4 shadow mb-4 border bg-white rounded-4 overflow-hidden">
 
       <div class="row g-4 mb-4">
         <div class="col-md-6">
@@ -316,7 +316,7 @@
     </div>
 
   } @else {
-    <div class="card p-3 shadow-sm border-0 bg-white mx-auto"
+    <div class="card p-3 shadow border-0 bg-white rounded-4 mx-auto "
          id="invoice-preview-container" style="max-width: 1000px;">
       <!-- modificare p-3 (con altro valore) per aumentare o diminuire bordo su anterpima pdf -->
 
@@ -429,65 +429,6 @@
         </div>
       </div>
 
-    </div>
-  }
-
-  @if (mostraModalEmail) {
-
-    <div class="modal-backdrop fade show"></div>
-
-    <div class="modal fade show d-block" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow-lg border-0 rounded-4">
-
-          <div class="modal-header bg-light border-bottom-0 rounded-top-4">
-            <h5 class="modal-title fw-bold text-secondary">
-              <i class="bi bi-envelope-paper me-2"></i> Riepilogo Invio Email
-            </h5>
-            <button (click)="chiudiModalEmail()" class="btn-close" type="button"></button>
-          </div>
-
-          <div class="modal-body p-4">
-
-            <div class="mb-3">
-              <label class="form-label fw-semibold text-muted small">A (Destinatario):</label>
-              <input [(ngModel)]="emailDestinatario" class="form-control" placeholder="es. cliente@email.it"
-                     type="email"/>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-semibold text-muted small">Oggetto:</label>
-              <input [(ngModel)]="emailOggetto" class="form-control" type="text"/>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-semibold text-muted small">File Allegato:</label>
-              <div class="input-group">
-                <span class="input-group-text bg-white"><i class="bi bi-file-earmark-pdf text-danger"></i></span>
-                <input [(ngModel)]="emailNomeFile" class="form-control bg-light" type="text"/>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-semibold text-muted small">Messaggio:</label>
-              <textarea [(ngModel)]="emailMessaggio" class="form-control" rows="6"></textarea>
-            </div>
-
-          </div>
-
-          <div class="modal-footer border-top-0 bg-light rounded-bottom-4">
-            <button (click)="chiudiModalEmail()" class="btn btn-outline-secondary btn-sm px-4 rounded-pill"
-                    type="button">
-              Annulla
-            </button>
-            <button (click)="confermaInvioEmail()" class="btn btn-primary px-4 btn-sm rounded-pill shadow-sm"
-                    type="button">
-              <i class="bi bi-send-fill me-1"></i> Conferma Invio
-            </button>
-          </div>
-
-        </div>
-      </div>
     </div>
   }
 </div>
