@@ -66,7 +66,7 @@ export class Preventivi implements OnInit {
     return this.clienti().filter(c => c.nome.toLowerCase().includes(term));
   });
   // --- VARIABILI PER LA MODALE EMAIL ---
-  mostraModalEmail = false;
+  mostraModalEmail = signal(false);
 
   /* ==========================================================================
      LOGICA DI AUTOCOMPLETAMENTO
@@ -365,12 +365,12 @@ export class Preventivi implements OnInit {
     this.emailMessaggio = `Gentile ${nomeCliente},\n\nIn allegato trova il preventivo richiesto.\n\nRimaniamo a disposizione per qualsiasi chiarimento.\n\nCordiali saluti.\n\n${invoice.fromName || 'La tua azienda'}`;
 
     // Mostra la finestra modale
-    this.mostraModalEmail = true;
+    this.mostraModalEmail.set(true);
   }
 
   /* Chiude la modale annullando l'operazione */
   chiudiModalEmail() {
-    this.mostraModalEmail = false;
+    this.mostraModalEmail.set(false);
   }
 
   /* Funzione che effettivamente genera il PDF e manda i dati al server */
