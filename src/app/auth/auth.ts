@@ -17,7 +17,7 @@ export class Auth {
   private http = inject(HttpClient);
 
   // Endpoint base per le API di autenticazione del backend
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private apiUrl = 'https://ligno-suite-api.onrender.com/auth';
 
   /**
    * Effettua la richiesta di Login al backend.

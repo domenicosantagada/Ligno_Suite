@@ -19,7 +19,7 @@ export class RubricaService {
   private authService = inject(Auth);
 
   // L'indirizzo base del backend Spring Boot per la gestione dei clienti
-  private apiUrl = 'http://localhost:8080/api/clienti';
+  private apiUrl = 'https://ligno-suite-api.onrender.com/clienti';
 
   /**
    * RECUPERA I CLIENTI (READ - Metodo HTTP GET)
