@@ -1,21 +1,85 @@
+/* Wrapper principale: centra verticalmente e orizzontalmente */
 .login-wrapper {
-  /* Prende tutta l'altezza dello schermo e centra la card */
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8f9fa; /* Sfondo grigio molto chiaro, coerente con le tue tabelle */
-  margin: -1.5rem; /* Margin negativo necessario per contrastare l'eventuale padding del body */
+  background-color: #ffffff;
+  margin: -1.5rem; /* Compensa eventuale padding globale */
 }
 
+/* Card login: larghezza fluida con limite */
 .login-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
 }
 
-/* Stile per dare un effetto focus ai campi di testo */
+/* Contenuto con larghezza controllata */
+.max-width-content {
+  max-width: 600px;
+}
+
+/* Titolo principale */
+h1 {
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+}
+
+/* Input focus: effetto pulito e moderno */
 .form-control:focus {
-  background-color: #ffffff !important;
-  border: 1px solid #212529 !important;
-  box-shadow: none;
+  background-color: #f8f9fa !important;
+  border: 1px solid #dee2e6 !important;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Animazione ingresso */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Classe base animazione */
+.appear {
+  opacity: 0;
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Ritardi animazione */
+.animation-delay-1 {
+  animation-delay: 0.1s;
+}
+
+.animation-delay-2 {
+  animation-delay: 0.3s;
+}
+
+.animation-delay-3 {
+  animation-delay: 0.5s;
+}
+
+/* Icone: micro-interazione hover */
+.bi {
+  transition: transform 0.3s ease;
+}
+
+.col-6:hover .bi {
+  transform: scale(1.1);
+}
+
+/* Responsive: semplifica layout su tablet/mobile */
+@media (max-width: 991.98px) {
+  .bg-light {
+    background-color: #ffffff !important;
+  }
+
+  .login-card {
+    box-shadow: none !important;
+    border: none !important;
+  }
 }

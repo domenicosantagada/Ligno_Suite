@@ -1,77 +1,123 @@
-<!-- Div contenitore generale con stili personalizzati -->
-<div class="login-wrapper">
+<div class="login-wrapper p-0 overflow-hidden">
+  <div class="row g-0 vh-100 w-100">
 
-  <!-- Card principale del login -->
-  <!-- Stili importati da bootstrap -->
-  <div class="card shadow-sm border-0 rounded-4 login-card">
+    <div class="col-lg-7 d-none d-lg-flex flex-column justify-content-center p-5 bg-white border-end">
+      <div class="max-width-content mx-auto">
 
-    <!-- card-body con p-5 per dare spazio interno -->
-    <div class="card-body p-5">
-      <div class="text-center mb-4">
-        <h4 class="fw-bold text-dark">Crea un Account</h4>
+        <div class="mb-5 animation-delay-1">
+          <img alt="Logo" class="mb-4 appear" src="image/LignoSuiteLogo.svg" width="180">
+          <h1 class="display-4 fw-bold text-dark mb-3 appear">Inizia a costruire <br>il tuo successo.</h1>
+          <p class="fs-5 text-secondary lead appear">Unisciti alle falegnamerie che hanno già digitalizzato il loro
+            lavoro.</p>
+        </div>
+
+        <div class="row g-4 mt-2">
+          <div class="col-6 appear animation-delay-2">
+            <div class="d-flex gap-3">
+              <i class="bi bi-rocket-takeoff fs-3 text-dark"></i>
+              <div>
+                <h6 class="fw-bold mb-1">Setup Rapido</h6>
+                <p class="small text-muted">Configura la tua azienda in meno di un minuto.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 appear animation-delay-2">
+            <div class="d-flex gap-3">
+              <i class="bi bi-cloud-check fs-3 text-dark"></i>
+              <div>
+                <h6 class="fw-bold mb-1">Sempre Online</h6>
+                <p class="small text-muted">I tuoi preventivi e la tua rubrica sempre con te.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 appear animation-delay-3">
+            <div class="d-flex gap-3">
+              <i class="bi bi-magic fs-3 text-dark"></i>
+              <div>
+                <h6 class="fw-bold mb-1">Potenza IA</h6>
+                <p class="small text-muted">Descrizioni professionali scritte dall'intelligenza artificiale.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 appear animation-delay-3">
+            <div class="d-flex gap-3">
+              <i class="bi bi-heart fs-3 text-dark"></i>
+              <div>
+                <h6 class="fw-bold mb-1">Supporto Dedicato</h6>
+                <p class="small text-muted">Siamo al fianco degli artigiani, ogni giorno.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <!-- Controllo se l'errore non è vuoto-->
-      <!-- Altrimenti mostra un messaggio di errore -->
-      @if (errore) {
-        <div class="alert alert-danger py-2 small">{{ errore }}</div>
-      }
-
-
-      <!-- Reactive Form collegato al FormGroup registerForm -->
-      <!-- ngSubmit intercetta il submit e richiama onSubmit() -->
-      <form (ngSubmit)="onSubmit()" [formGroup]="registerForm">
-
-        <!-- Campo Nome/Azienda collegato al FormControl "nome" -->
-        <div class="mb-3">
-          <label class="form-label text-muted small fw-bold">
-            Nome / Azienda
-          </label>
-          <input class="form-control bg-light border-0 text-capitalize"
-                 formControlName="nome"
-                 placeholder="Il tuo nome"
-                 type="text">
-        </div>
-
-        <!-- Campo Email collegato al FormControl "email" -->
-        <div class="mb-3">
-          <label class="form-label text-muted small fw-bold">
-            Email
-          </label>
-          <input class="form-control bg-light border-0 text-lowercase"
-                 formControlName="email"
-                 placeholder="Inserisci la tua email"
-                 type="email">
-        </div>
-
-        <!-- Campo Password collegato al FormControl "password" -->
-        <div class="mb-4">
-          <label class="form-label text-muted small fw-bold">
-            Password
-          </label>
-          <input class="form-control bg-light border-0"
-                 formControlName="password"
-                 placeholder="Scegli una password"
-                 type="password">
-        </div>
-
-        <!-- Pulsante disabilitato finché il form non è valido -->
-        <button [disabled]="registerForm.invalid"
-                class="btn btn-dark btn-lg w-100 rounded-pill mb-3"
-                type="submit">
-          Registrati
-        </button>
-
-        <!-- Navigazione verso login tramite Angular Router -->
-        <div class="text-center small">
-          Hai già un account?
-          <a class="text-dark fw-bold text-decoration-none"
-             routerLink="/login">
-            Accedi qui
-          </a>
-        </div>
-
-      </form>
     </div>
+
+    <div class="col-12 col-lg-5 d-flex align-items-center justify-content-center bg-light px-4">
+      <div class="card shadow border rounded-4 login-card border-0 shadow-lg appear">
+        <div class="card-body p-5">
+
+          <div class="text-center mb-4 d-lg-none">
+            <img alt="Logo" class="mb-3" src="image/LignoSuiteLogo.svg" width="200">
+          </div>
+
+          <div class="mb-4">
+            <h3 class="fw-bold text-dark mb-1">Crea Account</h3>
+            <p class="text-muted small">Compila i campi per attivare LignoSuite.</p>
+          </div>
+
+          @if (errore) {
+            <div class="alert alert-danger py-2 small text-center">{{ errore }}</div>
+          }
+
+          <form (ngSubmit)="onSubmit()" [formGroup]="registerForm">
+
+            <div class="mb-3">
+              <label class="form-label text-muted small fw-bold">Nome / Azienda</label>
+              <input class="form-control bg-light border-0 text-capitalize"
+                     formControlName="nome"
+                     placeholder="Es. Falegnameria Rossi"
+                     type="text">
+              @if (registerForm.get('nome')?.hasError('required') && registerForm.get('nome')?.touched) {
+                <small class="text-danger mt-1 d-block">Il nome è obbligatorio</small>
+              }
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label text-muted small fw-bold">Email</label>
+              <input class="form-control bg-light border-0 text-lowercase"
+                     formControlName="email"
+                     placeholder="nome@esempio.it"
+                     type="email">
+              @if (registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched) {
+                <small class="text-danger mt-1 d-block">Inserisci un'email valida</small>
+              }
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label text-muted small fw-bold">Password</label>
+              <input class="form-control bg-light border-0"
+                     formControlName="password"
+                     placeholder="Minimo 6 caratteri"
+                     type="password">
+              @if (registerForm.get('password')?.hasError('minlength') && registerForm.get('password')?.touched) {
+                <small class="text-danger mt-1 d-block">La password deve essere di almeno 6 caratteri</small>
+              }
+            </div>
+
+            <button [disabled]="registerForm.invalid"
+                    class="btn btn-dark btn-lg w-100 rounded-pill py-3 fw-bold shadow-sm"
+                    type="submit">
+              Registrati ora
+            </button>
+
+            <div class="text-center mt-4 small">
+              Hai già un account?
+              <a class="text-dark fw-bold text-decoration-none" routerLink="/login"> Accedi qui</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

@@ -1,113 +1,106 @@
-<!-- div principale che avvolge tutto il contenuto del login -->
-<div class="login-wrapper">
+<div class="login-wrapper p-0 overflow-hidden">
+  <div class="row g-0 vh-100 w-100">
 
-  <!-- Card principale del login -->
-  <!-- shadow-sm per ombra leggera -->
-  <!-- border-0 rimuove bordo Bootstrap -->
-  <!-- rounded-4 angoli arrotondati -->
-  <div class="card shadow border rounded-4 login-card">
+    <div class="col-lg-7 d-none d-lg-flex flex-column justify-content-center p-5 bg-white border-end">
+      <div class="max-width-content mx-auto">
 
-    <!-- card-body con p-5 per dare spazio interno generoso -->
-    <div class="card-body p-5 ">
+        <div class="mb-5 animation-delay-1">
+          <img alt="Logo" class="mb-4 appear" src="image/LignoSuiteLogo.svg" width="180">
+          <h1 class="display-4 fw-bold text-dark mb-3 appear">L'artigianato incontra <br>il futuro digitale.</h1>
+          <p class="fs-5 text-secondary lead appear">Progettato specificamente per le falegnamerie moderne. Semplice,
+            veloce, essenziale.</p>
+        </div>
 
-      <!-- Sezione logo + titolo -->
-      <!-- text-center per centratura contenuto -->
-      <div class="text-center mb-4 ">
-        <img alt="Logo"
-             class="mb-3"
-             src="image/LignoSuiteLogo.svg"
-             width="230">
-        <h4 class="fw-bold text-dark">Accedi</h4>
+        <div class="row g-4 mt-2">
+          <div class="col-6 appear animation-delay-2">
+            <div class="d-flex gap-3">
+              <i class="bi bi-file-earmark-text fs-3 text-dark"></i>
+              <div>
+                <h6 class="fw-bold mb-1">Preventivi Intelligenti</h6>
+                <p class="small text-muted">Generazione assistita da IA e invio PDF immediato.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 appear animation-delay-2">
+            <div class="d-flex gap-3">
+              <i class="bi bi-aspect-ratio fs-3 text-dark"></i>
+              <div>
+                <h6 class="fw-bold mb-1">Ottimizzazione Taglio</h6>
+                <p class="small text-muted">Riduci gli scarti di materiale con algoritmi avanzati.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 appear animation-delay-3">
+            <div class="d-flex gap-3">
+              <i class="bi bi-people fs-3 text-dark"></i>
+              <div>
+                <h6 class="fw-bold mb-1">Gestione Rubrica</h6>
+                <p class="small text-muted">Tutti i tuoi contatti organizzati in un unico posto.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 appear animation-delay-3">
+            <div class="d-flex gap-3">
+              <i class="bi bi-shield-check fs-3 text-dark"></i>
+              <div>
+                <h6 class="fw-bold mb-1">Sicurezza Cloud</h6>
+                <p class="small text-muted">Dati protetti e accessibili ovunque ti trovi.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <!-- Messaggio di errore globale login (es. credenziali errate) -->
-      <!-- Mostrato solo se la variabile errore è valorizzata -->
-      @if (errore) {
-        <div class="alert alert-danger py-2 small text-center">
-          {{ errore }}
-        </div>
-      }
-
-      <!-- Reactive Form collegato a loginForm -->
-      <!-- ngSubmit intercetta il submit del form -->
-      <form (ngSubmit)="onSubmit()" [formGroup]="loginForm">
-
-        <!-- Campo Email -->
-        <div class="mb-3">
-          <label class="form-label text-muted small fw-bold">Email</label>
-
-          <!-- formControlName collega l'input al FormControl "email" -->
-          <!-- bg-light + border-0 per stile pulito -->
-          <input class="form-control bg-light border-0"
-                 formControlName="email"
-                 placeholder="Inserisci la tua email"
-                 type="email">
-
-          <!-- Validazione: required -->
-          <!-- Mostrata solo se il campo è stato toccato -->
-          @if (loginForm.get('email')?.hasError('required')
-          && loginForm.get('email')?.touched) {
-            <small class="text-danger mt-1 d-block">
-              L'email è obbligatoria
-            </small>
-          }
-
-          <!-- Validazione: formato email non valido -->
-          @if (loginForm.get('email')?.hasError('email')
-          && loginForm.get('email')?.touched) {
-            <small class="text-danger mt-1 d-block">
-              Formato email non valido
-            </small>
-          }
-        </div>
-
-        <!-- Campo Password -->
-        <div class="mb-4">
-          <label class="form-label text-muted small fw-bold">Password</label>
-
-          <!-- Collegato al FormControl "password" -->
-          <input class="form-control bg-light border-0"
-                 formControlName="password"
-                 placeholder="Inserisci la password"
-                 type="password">
-
-          <!-- Validazione: required -->
-          @if (loginForm.get('password')?.hasError('required')
-          && loginForm.get('password')?.touched) {
-            <small class="text-danger mt-1 d-block">
-              La password è obbligatoria
-            </small>
-          }
-
-          <!-- Validazione: minlength -->
-          @if (loginForm.get('password')?.hasError('minlength')
-          && loginForm.get('password')?.touched) {
-            <small class="text-danger mt-1 d-block">
-              Minimo 6 caratteri
-            </small>
-          }
-        </div>
-
-        <!-- Pulsante submit -->
-        <!-- Disabilitato se il form è invalido -->
-        <!-- w-100 per larghezza piena -->
-        <button [disabled]="loginForm.invalid"
-                class="btn btn-dark btn-lg w-100 rounded-pill"
-                type="submit">
-          Login
-        </button>
-
-        <!-- Link navigazione verso registrazione -->
-        <!-- routerLink per routing Angular -->
-        <div class="text-center mt-3 small">
-          Non hai un account?
-          <a class="text-dark fw-bold text-decoration-none"
-             routerLink="/register">
-            Registrati
-          </a>
-        </div>
-
-      </form>
     </div>
+
+    <div class="col-12 col-lg-5 d-flex align-items-center justify-content-center bg-light px-4">
+      <div class="card shadow border rounded-4 login-card border-0 shadow-lg appear">
+        <div class="card-body p-5">
+
+          <div class="text-center mb-4 d-lg-none">
+            <img alt="Logo" class="mb-3" src="image/LignoSuiteLogo.svg" width="200">
+          </div>
+
+          <div class="mb-4">
+            <h3 class="fw-bold text-dark mb-1">Accedi</h3>
+            <p class="text-muted small">Inserisci le tue credenziali per continuare.</p>
+          </div>
+
+          @if (errore) {
+            <div class="alert alert-danger py-2 small text-center">{{ errore }}</div>
+          }
+
+          <form (ngSubmit)="onSubmit()" [formGroup]="loginForm">
+            <div class="mb-3">
+              <label class="form-label text-muted small fw-bold">Email</label>
+              <input class="form-control bg-light border-0" formControlName="email" placeholder="nome@esempio.it"
+                     type="email">
+              @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
+                <small class="text-danger mt-1 d-block">L'email è obbligatoria</small>
+              }
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label text-muted small fw-bold">Password</label>
+              <input class="form-control bg-light border-0" formControlName="password" placeholder="••••••••"
+                     type="password">
+              @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+                <small class="text-danger mt-1 d-block">La password è obbligatoria</small>
+              }
+            </div>
+
+            <button [disabled]="loginForm.invalid" class="btn btn-dark btn-lg w-100 rounded-pill py-3 fw-bold shadow-sm"
+                    type="submit">
+              Entra in LignoSuite
+            </button>
+
+            <div class="text-center mt-4 small">
+              Nuovo in falegnameria?
+              <a class="text-dark fw-bold text-decoration-none" routerLink="/register"> Crea un account</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
