@@ -1,0 +1,64 @@
+<div class="container py-5 appear">
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+      <h1 class="fw-bold text-dark mb-1">Area Cliente</h1>
+      <p class="text-muted mb-0">Benvenuto, {{ utente()?.nome }} ({{ utente()?.email }})</p>
+    </div>
+
+    <button (click)="logout()" class="btn btn-outline-danger rounded-pill px-4 shadow-sm fw-bold">
+      <i class="bi bi-box-arrow-right me-2"></i>Esci
+    </button>
+  </div>
+
+  @if (preventiviRicevuti().length === 0) {
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted">
+      <i class="bi bi-folder2-open display-1 mb-3 text-secondary opacity-50"></i>
+      <h4 class="fw-bold text-dark">Nessun preventivo ricevuto</h4>
+      <p>Quando un falegname ti invierà un preventivo, apparirà qui.</p>
+    </div>
+  }
+
+  @if (preventiviRicevuti().length > 0) {
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+          <tr>
+            <th class="text-secondary small fw-bold px-4 py-3">N° Preventivo</th>
+            <th class="text-secondary small fw-bold py-3">Data</th>
+            <th class="text-secondary small fw-bold py-3">Mittente (Falegnameria)</th>
+            <th class="text-secondary small fw-bold py-3 text-end">Totale</th>
+            <th class="text-secondary small fw-bold py-3 px-4 text-center">Azione</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (prev of preventiviRicevuti(); track prev.id) {
+              <tr class="cursor-pointer">
+                <td class="px-4 py-3">
+                  <span class="badge bg-dark rounded-pill px-3 py-2">
+                    # {{ prev.invoiceNumber }}
+                  </span>
+                </td>
+                <td class="py-3 text-muted">
+                  {{ prev.date | date:'dd/MM/yyyy' }}
+                </td>
+                <td class="py-3 fw-medium">
+                  {{ prev.fromName || 'N/D' }}
+                </td>
+                <td class="py-3 text-end fw-bold text-success">
+                  € {{ prev.total | number:'1.2-2' }}
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <button (click)="apriPreventivo(prev)"
+                          class="btn btn-sm btn-light rounded-pill px-3 shadow-sm border"><i class="bi bi-eye me-1"></i>
+                    Visualizza
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>
