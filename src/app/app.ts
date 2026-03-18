@@ -99,8 +99,20 @@ export class App implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  isCliente() {
+  // Verifica se c'è un utente attualmente loggato (Falegname o Cliente non importa)
+  isLoggedIn(): boolean {
+    return this.authService.getUtenteLoggato() !== null;
+  }
+
+  // Verifica se è loggato ed è un Cliente
+  isCliente(): boolean {
     const u = this.authService.getUtenteLoggato();
     return u !== null && u.ruolo === 'CLIENTE';
+  }
+
+  // Verifica se è loggato ed è un Falegname (o profilo standard retrocompatibile)
+  isFalegname(): boolean {
+    const u = this.authService.getUtenteLoggato();
+    return u !== null && u.ruolo !== 'CLIENTE';
   }
 }

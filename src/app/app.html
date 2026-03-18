@@ -1,18 +1,30 @@
-@if (router.url !== '/login' && router.url !== '/register') {
-  @if (!isCliente()) {
-    <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
-      <div class="container-fluid">
+@if (router.url !== '/login' && router.url !== '/register' && isLoggedIn()) {
 
-        <div class="d-flex align-items-center" style="flex: 1;">
-          <a (click)="chiudiMenuHamburger()" [routerLink]="['/home']" class="navbar-brand m-0">
+  <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
+    <div class="container-fluid">
+
+      <div class="d-flex align-items-center" style="flex: 1;">
+
+        @if (isCliente()) {
+          <a (click)="chiudiMenuHamburger()" [routerLink]="['/dashboard-cliente']" class="navbar-brand m-0"
+             style="cursor: pointer;">
             <img alt="Logo" class="d-inline-block align-text-top" height="70" src="image/LignoSuiteLogo.svg">
           </a>
-        </div>
+        }
 
-        <div (click)="$event.stopPropagation()" [class.show]="menuHamburgerAperto()"
-             class="collapse navbar-collapse justify-content-center" id="navbarContenuto" style="flex: 0 1 auto;">
-          <ul class="navbar-nav mb-2 mb-lg-0">
+        @if (isFalegname()) {
+          <a (click)="chiudiMenuHamburger()" [routerLink]="['/home']" class="navbar-brand m-0" style="cursor: pointer;">
+            <img alt="Logo" class="d-inline-block align-text-top" height="70" src="image/LignoSuiteLogo.svg">
+          </a>
+        }
 
+      </div>
+
+      <div (click)="$event.stopPropagation()" [class.show]="menuHamburgerAperto()"
+           class="collapse navbar-collapse justify-content-center" id="navbarContenuto" style="flex: 0 1 auto;">
+        <ul class="navbar-nav mb-2 mb-lg-0">
+
+          @if (isFalegname()) {
             <li class="nav-item">
               <a (click)="chiudiMenuHamburger()" [routerLink]="['/lista-preventivi']" class="nav-link custom-link">Preventivi</a>
             </li>
@@ -47,40 +59,40 @@
                   <a (click)="menuGestioneAperto.set(false); chiudiMenuHamburger()" [routerLink]="['/impostazioni']"
                      class="dropdown-item custom-dropdown-item">Impostazioni</a>
                 </li>
-                <!--
-                <li>
-                  <a (click)="menuGestioneAperto.set(false); chiudiMenuHamburger()" [routerLink]="['/home']"
-                     class="dropdown-item custom-dropdown-item">Altro</a>
-                </li>
-                -->
               </ul>
             </li>
+          }
 
-            <li class="nav-item d-lg-none mt-3 mb-2">
-              <button (click)="logout()" class="btn btn-outline-danger btn-sm px-4 rounded-pill w-100" type="button">
-                <i class="bi bi-box-arrow-in-right"></i> Esci
-              </button>
+          @if (isCliente()) {
+            <li class="nav-item">
+              <a (click)="chiudiMenuHamburger()" [routerLink]="['/impostazioni-cliente']" class="nav-link custom-link">Impostazioni</a>
             </li>
+          }
 
-          </ul>
-        </div>
+          <li class="nav-item d-lg-none mt-3 mb-2">
+            <button (click)="logout()" class="btn btn-outline-danger btn-sm px-4 rounded-pill w-100" type="button">
+              <i class="bi bi-box-arrow-in-right"></i> Esci
+            </button>
+          </li>
 
-        <div class="d-flex justify-content-end align-items-center" style="flex: 1;">
+        </ul>
+      </div>
 
-          <button (click)="logout()" class="btn btn-outline-danger btn-sm px-4 rounded-pill me-2 d-none d-lg-block"
-                  type="button">
-            <i class="bi bi-box-arrow-in-right"></i> Esci
-          </button>
+      <div class="d-flex justify-content-end align-items-center" style="flex: 1;">
 
-          <button (click)="toggleMenuHamburger($event)" class="navbar-toggler border-0" type="button">
-            <span class="navbar-toggler-icon"></span>
-          </button>
+        <button (click)="logout()" class="btn btn-outline-danger btn-sm px-4 rounded-pill me-2 d-none d-lg-block"
+                type="button">
+          <i class="bi bi-box-arrow-in-right"></i> Esci
+        </button>
 
-        </div>
+        <button (click)="toggleMenuHamburger($event)" class="navbar-toggler border-0" type="button">
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
       </div>
-    </nav>
-  }
+
+    </div>
+  </nav>
 }
 
 <div [class.container]="router.url !== '/login' && router.url !== '/register'"

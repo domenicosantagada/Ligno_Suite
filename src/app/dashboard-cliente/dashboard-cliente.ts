@@ -52,7 +52,4 @@ export class DashboardCliente implements OnInit {
     this.router.navigate(['/preventivi'], {queryParams: {preview: 'true'}});
   }
 
-  logout() {
-    this.authService.logout();
-  }
 }
