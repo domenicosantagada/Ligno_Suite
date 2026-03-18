@@ -5,42 +5,57 @@
     <div class="d-flex align-items-center ">
 
       <!-- Icona della nuvola con spunta o con freccia verso l'alto a seconda se ci sono modifiche non salvate o no -->
-      <div class="me-3 fs-4">
-        @if (preventiviService.hasUnsavedChanges()) {
-          <i class="bi bi-cloud-arrow-up-fill text-danger" title="Modifiche non salvate"></i>
-        } @else {
-          <i class="bi bi-cloud-check-fill text-success" title="Tutte le modifiche sono salvate"></i>
-        }
-      </div>
+      @if (!isCliente()) {
+        <div class="me-3 fs-4">
+          @if (preventiviService.hasUnsavedChanges()) {
+            <i class="bi bi-cloud-arrow-up-fill text-danger" title="Modifiche non salvate"></i>
+          } @else {
+            <i class="bi bi-cloud-check-fill text-success" title="Tutte le modifiche sono salvate"></i>
+          }
+        </div>
+      }
 
-      <!-- BOTTONE ANTEPRIMA / SALVA -->
-      <!-- Se siamo in modalità anteprima, mostriamo i pulsanti per tornare alla modifica e scaricare il PDF -->
-      @if (isPreview()) {
-        <!-- <button (click)="creaNuovo()" class="btn btn-dark btn-sm px-4 rounded-pill">
-        btn-sm per rendere il pulsante più piccolo, in modo da differenziarlo visivamente dagli altri pulsanti di azione principali come "Salva" e "Vedi Anteprima".
-        px-4 serve per impostare un padding di 4px su ogni lato del pulsante
-        rounded-pill serve per rendere il pulsante arrotondato e con bordi arrotondati.
-        -->
+      @if (isCliente()) {
 
-        <button (click)="togglePreview()" class="btn btn-dark me-2 rounded-pill btn-sm px-3">
-          <i class="bi bi-pencil"></i> Modifica
+        <button class="btn btn-outline-dark me-2 rounded-pill btn-sm px-3" routerLink="/dashboard-cliente">
+          <i class="bi bi-arrow-left"></i> Torna indietro
         </button>
-        <button (click)="downloadPDF()" class="btn btn-success me-2 rounded-pill btn-sm px-3">
+        <button (click)="downloadPDF()" class="btn btn-success rounded-pill btn-sm px-3">
           <i class="bi bi-download"></i> Scarica PDF
         </button>
-        <button (click)="apriModalEmail()" class="btn btn-warning rounded-pill btn-sm px-3">
-          <i class="bi bi-envelope"></i> Invia Email
-        </button>
+
       } @else {
-        <!-- Se non siamo in modalità anteprima, mostriamo i pulsanti per visualizzare l'anteprima e salvare il preventivo -->
-        <button (click)="togglePreview()" class="btn btn-dark btn-sm px-4 rounded-pill me-2">
-          <i class="bi bi-eye"></i> Vedi Anteprima
-        </button>
-        <button
-          (click)="preventiviService.salvaPreventivoNelDb()"
-          class="btn btn-success btn-sm px-4 rounded-pill"><i class="bi-floppy"></i>
-          Salva
-        </button>
+
+        <!-- BOTTONE ANTEPRIMA / SALVA -->
+          <!-- Se siamo in modalità anteprima, mostriamo i pulsanti per tornare alla modifica e scaricare il PDF -->
+        @if (isPreview()) {
+          <!-- <button (click)="creaNuovo()" class="btn btn-dark btn-sm px-4 rounded-pill">
+          btn-sm per rendere il pulsante più piccolo, in modo da differenziarlo visivamente dagli altri pulsanti di azione principali come "Salva" e "Vedi Anteprima".
+          px-4 serve per impostare un padding di 4px su ogni lato del pulsante
+          rounded-pill serve per rendere il pulsante arrotondato e con bordi arrotondati.
+          -->
+
+          <button (click)="togglePreview()" class="btn btn-dark me-2 rounded-pill btn-sm px-3">
+            <i class="bi bi-pencil"></i> Modifica
+          </button>
+          <button (click)="downloadPDF()" class="btn btn-success me-2 rounded-pill btn-sm px-3">
+            <i class="bi bi-download"></i> Scarica PDF
+          </button>
+          <button (click)="apriModalEmail()" class="btn btn-warning rounded-pill btn-sm px-3">
+            <i class="bi bi-envelope"></i> Invia Email
+          </button>
+        } @else {
+          <!-- Se non siamo in modalità anteprima, mostriamo i pulsanti per visualizzare l'anteprima e salvare il preventivo -->
+          <button (click)="togglePreview()" class="btn btn-dark btn-sm px-4 rounded-pill me-2">
+            <i class="bi bi-eye"></i> Vedi Anteprima
+          </button>
+          <button
+            (click)="preventiviService.salvaPreventivoNelDb()"
+            class="btn btn-success btn-sm px-4 rounded-pill"><i class="bi-floppy"></i>
+            Salva
+          </button>
+        }
+
       }
     </div>
   </div>

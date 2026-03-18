@@ -220,6 +220,10 @@ export class PreventiviService {
     return this.http.get<InvoiceData[]>(`${this.apiUrl}?utenteId=${utenteId}`);
   }
 
+  getPreventiviPerCliente(email: string) {
+    return this.http.get<InvoiceData[]>(`${this.apiUrl}/cliente?email=${email}`);
+  }
+  
   eliminaPreventivoDalDb(id: number) {
     // 1. Recupera i dati dell'utente loggato dal servizio Auth
     const utenteLoggato = this.authService.getUtenteLoggato();

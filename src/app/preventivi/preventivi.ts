@@ -2,7 +2,7 @@ import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 // ActivatedRoute serve per leggere l'URL attuale e i suoi parametri (es. ?preview=true)
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {PreventiviService} from './preventivi.service';
 import {RubricaService} from '../rubrica/rubrica.service';
 import {Cliente} from '../rubrica/rubrica';
@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-preventivi',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './preventivi.html',
   styleUrl: './preventivi.css',
 })
@@ -44,6 +44,8 @@ export class Preventivi implements OnInit {
 
   // Gestisce la visualizzazione: true = Anteprima PDF / false = Modalità Modifica
   isPreview = signal(false);
+  // Signal per sapere se l'utente è un cliente (modalità sola lettura)
+  isCliente = signal(false);
 
   // Variabili per gestire la tendina di ricerca clienti (Autocompletamento)
   clienti = signal<Cliente[]>([]);
@@ -87,37 +89,66 @@ export class Preventivi implements OnInit {
      INIZIALIZZAZIONE COMPONENTE
      ========================================================================== */
   ngOnInit() {
-    // 1. Leggiamo i parametri dell'URL
+    const utenteLoggato = this.authService.getUtenteLoggato();
+
+    // 1. Controlla se l'utente è un cliente e imposta il signal
+    if (utenteLoggato && utenteLoggato.ruolo === 'CLIENTE') {
+      this.isCliente.set(true);
+    }
+
+    // 2. Leggiamo i parametri dell'URL
     this.route.queryParams.subscribe(params => {
-      // Se arriviamo dalla lista cliccando sull'icona dell'occhio, l'URL avrà "?preview=true"
-      if (params['preview'] === 'true') {
+      // Se arriviamo dalla lista cliccando sull'icona dell'occhio, OPPURE se l'utente è un CLIENTE,
+      // forziamo la visualizzazione in modalità Anteprima/PDF.
+      if (params['preview'] === 'true' || this.isCliente()) {
         this.isPreview.set(true);
       } else {
         this.isPreview.set(false);
 
-        // Se è un nuovo preventivo (non ha numero), chiediamo al server di assegnare
-        // automaticamente il prossimo numero progressivo disponibile.
-        if (this.invoice().invoiceNumber === null) {
-          // 1. Allineiamo sempre i dati emittente con l'utente attualmente loggato
+        // Se è un nuovo preventivo (non ha numero) e NON siamo un cliente, chiediamo
+        // al server di assegnare automaticamente il prossimo numero progressivo disponibile.
+        if (!this.isCliente() && this.invoice().invoiceNumber === null) {
+          // Allineiamo sempre i dati emittente con l'utente attualmente loggato
           this.preventiviService.allineaDatiEmittenteSilenzioso();
 
-          // 2. Chiediamo al backend il prossimo numero progressivo
+          // Chiediamo al backend il prossimo numero progressivo
           this.preventiviService.ottieniProssimoNumero();
         }
       }
     });
 
-    // 2. Caricamento del Logo
-    const utenteLoggato = this.authService.getUtenteLoggato();
-    if (utenteLoggato && utenteLoggato.logoBase64) {
-      this.logoAzienda.set(utenteLoggato.logoBase64);
-    }
+    // 3. RECUPERO LOGO AZIENDALE (Logica separata)
+    if (this.isCliente()) {
+      // SE SEI UN CLIENTE:
+      // Il preventivo ha salvato al suo interno l'ID del falegname (utenteId).
+      // Usiamo quell'ID per chiedere al server i dati del falegname (incluso il logo).
+      const idFalegname = this.invoice().utenteId;
 
-    // 3. Caricamento rubrica in background per far funzionare l'autocompletamento
-    this.rubricaService.getClientiDalDb().subscribe({
-      next: (dati) => this.clienti.set(dati),
-      error: (err) => console.error('Errore caricamento clienti:', err)
-    });
+      if (idFalegname) {
+        this.authService.getUtenteById(idFalegname).subscribe({
+          next: (falegname: any) => {
+            if (falegname && falegname.logoBase64) {
+              this.logoAzienda.set(falegname.logoBase64);
+            }
+          },
+          error: (err) => console.error('Impossibile recuperare il logo del falegname', err)
+        });
+      }
+
+    } else {
+
+      // 3. Caricamento del Logo aziendale del falegname
+      if (utenteLoggato && utenteLoggato.logoBase64) {
+        this.logoAzienda.set(utenteLoggato.logoBase64);
+      }
+
+      // 4. Caricamento rubrica in background per far funzionare l'autocompletamento
+      this.rubricaService.getClientiDalDb().subscribe({
+        next: (dati) => this.clienti.set(dati),
+        error: (err) => console.error('Errore caricamento clienti:', err)
+      });
+
+    }
   }
 
   /* ==========================================================================
@@ -163,7 +194,14 @@ export class Preventivi implements OnInit {
    * Se restituisce true, lo fa uscire; se false, lo blocca sulla pagina.
    */
   async puoAbbandonarePagina(): Promise<boolean> {
-    // 1. Se NON ci sono modifiche non salvate (nuvoletta verde), esci subito
+    // Se è un cliente, esce direttamente senza avvisi
+    if (this.isCliente()) {
+      this.preventiviService.resetInvoice();
+      return true;
+    }
+
+    // Se è un falegname
+    // Se NON ci sono modifiche non salvate (nuvoletta verde), esci subito
     if (!this.preventiviService.hasUnsavedChanges()) {
       this.preventiviService.resetInvoice();
       return true;

@@ -9,6 +9,7 @@ import {Register} from './register/register';
 import {Rubrica} from './rubrica/rubrica';
 import {Impostazioni} from './impostazioni/impostazioni';
 import {authGuard} from './auth/auth.guard';
+import {DashboardCliente} from './dashboard-cliente/dashboard-cliente';
 
 /**
  * array delle ROTTE dell'applicazione.
@@ -55,4 +56,5 @@ export const routes: Routes = [
   {path: "prezzario", component: Prezzario, canActivate: [authGuard]},
   {path: "rubrica", component: Rubrica, canActivate: [authGuard]},
   {path: "impostazioni", component: Impostazioni, canActivate: [authGuard]},
+  {path: "dashboard-cliente", component: DashboardCliente, canActivate: [authGuard]}
 ];

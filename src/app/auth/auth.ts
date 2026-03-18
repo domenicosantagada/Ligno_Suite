@@ -80,4 +80,11 @@ export class Auth {
     // ed evitare che i dati di un utente si mescolino con il successivo!
     window.location.href = '/login';
   }
+
+  /**
+   * Recupera i dati di un utente specifico dal database usando il suo ID.
+   */
+  getUtenteById(id: number) {
+    return this.http.get(`${this.apiUrl}/${id}`);
+  }
 }

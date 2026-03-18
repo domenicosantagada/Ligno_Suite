@@ -29,7 +29,9 @@ export class Register {
     // L'email è obbligatoria e deve rispettare il formato standard (es. testo@dominio.it)
     email: ['', [Validators.required, Validators.email]],
     // La password è obbligatoria e deve avere una lunghezza minima di sicurezza (6 caratteri)
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    // Il ruolo dell'utente. Di dafault settato su "FALEGNAME"
+    ruolo: ['FALEGNAME', Validators.required]
   });
 
   // Strumenti per la navigazione e le chiamate API

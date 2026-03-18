@@ -71,6 +71,33 @@
 
           <form (ngSubmit)="onSubmit()" [formGroup]="registerForm">
 
+            <!-- SELETTORE DEL RUOLO DELL'UTENTE -->
+            <div class="mb-3">
+              <label class="form-label text-muted small fw-bold">Seleziona il tuo profilo</label>
+              <div class="d-flex gap-4 p-2 bg-white border rounded-3">
+                <div class="form-check mb-0">
+                  <input class="form-check-input text-dark focus-ring focus-ring-dark"
+                         formControlName="ruolo"
+                         id="ruoloFalegname"
+                         type="radio"
+                         value="FALEGNAME">
+                  <label class="form-check-label text-dark small fw-medium cursor-pointer" for="ruoloFalegname">
+                    Sono un Falegname
+                  </label>
+                </div>
+                <div class="form-check mb-0">
+                  <input class="form-check-input text-dark focus-ring focus-ring-dark"
+                         formControlName="ruolo"
+                         id="ruoloCliente"
+                         type="radio"
+                         value="CLIENTE">
+                  <label class="form-check-label text-dark small fw-medium cursor-pointer" for="ruoloCliente">
+                    Sono un Cliente
+                  </label>
+                </div>
+              </div>
+            </div>
+
             <div class="mb-3">
               <label class="form-label text-muted small fw-bold">Nome / Azienda</label>
               <input class="form-control bg-light border-0 text-capitalize"

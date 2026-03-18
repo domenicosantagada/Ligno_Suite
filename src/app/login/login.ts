@@ -50,8 +50,14 @@ export class Login {
           // Salva l'utente nel LocalStorage (così non deve rifare il login se aggiorna la pagina)
           this.authService.setUtenteLoggato(utente);
 
-          // Lo sposta sulla pagina principale
-          this.router.navigate(['/home']);
+          //Controllo del ruolo per il reindirizzamento
+          if (utente.ruolo === 'CLIENTE') {
+            // Se è un cliente, lo mandiamo alla sua dashboard (che creeremo tra poco)
+            this.router.navigate(['/dashboard-cliente']);
+          } else {
+            // Se è un falegname (o non ha ruolo specifico, per retrocompatibilità)
+            this.router.navigate(['/home']);
+          }
         },
 
         // Se il server rifiuta le credenziali (errore)

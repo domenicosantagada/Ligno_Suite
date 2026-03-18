@@ -98,4 +98,9 @@ export class App implements OnInit {
     // Dopo il logout, rimanda l'utente alla pagina di login
     this.router.navigate(['/login']);
   }
+
+  isCliente() {
+    const u = this.authService.getUtenteLoggato();
+    return u !== null && u.ruolo === 'CLIENTE';
+  }
 }
