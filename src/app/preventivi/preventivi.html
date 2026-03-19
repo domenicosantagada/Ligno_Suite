@@ -362,14 +362,17 @@
           <h6 class="fw-bold text-uppercase text-muted mb-3">Emittente</h6>
           <p class="fs-5 fw-bold mb-1">{{ invoice().fromName || '[Il tuo Nome/Azienda]' }}</p>
           <p class="text-muted mb-0">{{ invoice().fromEmail || '[La tua Email]' }}</p>
-          <p class="text-muted mb-0">{{ invoice().fromPiva ? 'P.IVA ' + invoice().fromPiva : '[La tua P.Iva]' }}</p>
+          <p class="text-muted mb-0">{{
+              invoice().fromPiva ? 'P.IVA ' + invoice().fromPiva : '' +
+                ''
+            }}</p>
         </div>
 
         <div class="col-sm-6 text-sm-end mt-4 mt-sm-0">
           <h6 class="fw-bold text-uppercase text-muted mb-3">Cliente</h6>
-          <p class="fs-5 fw-bold mb-1">{{ invoice().toName || '[Nome Cliente]' }}</p>
-          <p class="text-muted mb-0">{{ invoice().toEmail || '[Email Cliente]' }}</p>
-          <p class="text-muted mb-0">{{ invoice().toPiva ? 'P.IVA ' + invoice().toPiva : '[P.Iva Cliente]' }}</p>
+          <p class="fs-5 fw-bold mb-1">{{ invoice().toName || '' }}</p>
+          <p class="text-muted mb-0">{{ invoice().toEmail || '' }}</p>
+          <p class="text-muted mb-0">{{ invoice().toPiva ? 'P.IVA ' + invoice().toPiva : '' }}</p>
         </div>
       </div>
 

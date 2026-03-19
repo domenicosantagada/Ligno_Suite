@@ -28,11 +28,11 @@
           </tr>
           </thead>
           <tbody>
-            @for (prev of preventiviRicevuti(); track prev.id) {
+            @for (prev of preventiviRicevuti(); track prev.id; let n = $index) {
               <tr class="cursor-pointer">
                 <td class="px-4 py-3">
                   <span class="badge bg-dark rounded-pill px-3 py-2">
-                    # {{ prev.invoiceNumber }}
+                    # {{ n + 1 }}
                   </span>
                 </td>
                 <td class="py-3 text-muted">
