@@ -18,6 +18,11 @@ export class DashboardCliente implements OnInit {
   router = inject(Router);
   preventiviService = inject(PreventiviService);
 
+  // Signal per conservare il nome del titolare e la data odierna
+  nomeCliente = signal<string>('');
+  dataOggi = signal<string>('');
+
+  // Signal per conservare l'utente loggato
   utente = signal<any>(null);
 
   // Signal per conservare la lista dei preventivi ricevuti
@@ -44,12 +49,25 @@ export class DashboardCliente implements OnInit {
         }
       });
     }
+
+    if (utenteLoggato) {
+      this.nomeCliente.set(utenteLoggato.nome);
+    }
+
+    this.impostaDataOggi();
   }
 
   apriPreventivo(prev: InvoiceData) {
     this.preventiviService.caricaPreventivoPerModifica(prev);
 
     this.router.navigate(['/preventivi'], {queryParams: {preview: 'true'}});
+  }
+
+  private impostaDataOggi() {
+    const opzioni: Intl.DateTimeFormatOptions = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+    let data = new Date().toLocaleDateString('it-IT', opzioni);
+    data = data.charAt(0).toUpperCase() + data.slice(1);
+    this.dataOggi.set(data);
   }
 
 }
