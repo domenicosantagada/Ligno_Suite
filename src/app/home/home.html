@@ -1,6 +1,8 @@
 <div class="container-fluid py-4">
 
   <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5">
+
+    <!-- Saluto e data  -->
     <div>
       <h2 class="fw-bold text-dark mb-1">
         Benvenuto, {{ nomeTitolare() }}
@@ -17,8 +19,11 @@
   </div>
 
   <div class="row g-4 mb-5">
+
+    <!-- CARD PER IL TOTALE DI PREVENTIVI -->
     <div class="col-md-4">
-      <div class="card shadow border h-100 stat-card border-primary-custom" style="background-color: #e6f0ff;">
+      <div class="card shadow border h-100 stat-card border-primary-custom rounded-4"
+           style="background-color: #e6f0ff;">
         <div class="card-body p-4 d-flex align-items-center">
           <div class="flex-grow-1">
             <h6 class="text-muted text-uppercase fw-semibold mb-2">Totale Preventivi</h6>
@@ -31,8 +36,10 @@
       </div>
     </div>
 
+    <!-- CARD PER IL ULTIMO PREVENTIVO -->
     <div class="col-md-4">
-      <div class="card shadow border h-100 stat-card border-success-custom" style="background-color: #e6f7e6;">
+      <div class="card shadow border h-100 stat-card border-primary-custom rounded-4"
+           style="background-color: #e6f7e6;">
         <div class="card-body p-4 d-flex align-items-center">
           <div class="flex-grow-1">
             <h6 class="text-muted text-uppercase fw-semibold mb-2">Ultimo Preventivo</h6>
@@ -49,8 +56,10 @@
       </div>
     </div>
 
+    <!-- CARD PER IL NUMERO DI CLIENTI IN RUBRICA -->
     <div class="col-md-4">
-      <div class="card shadow border h-100 stat-card border-warning-custom" style="background-color: #fff0e0;">
+      <div class="card shadow border h-100 stat-card border-primary-custom rounded-4"
+           style="background-color: #fff0e0;">
         <div class="card-body p-4 d-flex align-items-center">
           <div class="flex-grow-1">
             <h6 class="text-muted text-uppercase fw-semibold mb-2">Clienti in Rubrica</h6>
@@ -64,9 +73,10 @@
     </div>
   </div>
 
+  <!-- CHART PER IL ANDAMENTO DEI PREVENTIVI -->
   <div class="row mb-5">
     <div class="col-12">
-      <div class="card shadow border">
+      <div class="card shadow border rounded-4">
         <div class="card-body p-4 p-md-5">
 
           <div class="d-flex justify-content-between align-items-start mb-4">
