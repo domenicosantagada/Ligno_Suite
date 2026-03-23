@@ -74,28 +74,22 @@
             <!-- SELETTORE DEL RUOLO DELL'UTENTE -->
             <div class="mb-3">
               <label class="form-label text-muted small fw-bold">Seleziona il tuo profilo</label>
-              <div class="d-flex gap-4 p-2 bg-white border rounded-3">
-                <div class="form-check mb-0">
-                  <input class="form-check-input text-dark focus-ring focus-ring-dark"
-                         formControlName="ruolo"
-                         id="ruoloFalegname"
-                         type="radio"
+
+              <div class="d-flex justify-content-center mb-4">
+                <div class="apple-segment-control">
+
+                  <input class="segment-input" formControlName="ruolo" id="roleFalegname" type="radio"
                          value="FALEGNAME">
-                  <label class="form-check-label text-dark small fw-medium cursor-pointer" for="ruoloFalegname">
-                    Sono un Falegname
-                  </label>
-                </div>
-                <div class="form-check mb-0">
-                  <input class="form-check-input text-dark focus-ring focus-ring-dark"
-                         formControlName="ruolo"
-                         id="ruoloCliente"
-                         type="radio"
-                         value="CLIENTE">
-                  <label class="form-check-label text-dark small fw-medium cursor-pointer" for="ruoloCliente">
-                    Sono un Cliente
-                  </label>
+                  <label class="segment-label" for="roleFalegname">Falegname</label>
+
+                  <input class="segment-input" formControlName="ruolo" id="roleCliente" type="radio" value="CLIENTE">
+                  <label class="segment-label" for="roleCliente">Cliente</label>
+
+                  <div class="segment-slider"></div>
+
                 </div>
               </div>
+
             </div>
 
             <div class="mb-3">
