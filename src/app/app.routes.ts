@@ -60,6 +60,5 @@ export const routes: Routes = [
 
 
   {path: "dashboard-cliente", component: DashboardCliente, canActivate: [authGuard]},
-  {path: "dashboard-cliente", component: DashboardCliente, canActivate: [authGuard]},
   {path: "impostazioni-cliente", component: ImpostazioniCliente, canActivate: [authGuard]}
 ];

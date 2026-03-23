@@ -25,6 +25,9 @@ export class App implements OnInit {
   router = inject(Router); // Serve per comandare la navigazione via codice (es. dopo il logout, rimanda al Login)
   authService = inject(Auth); // servizio di autenticazione per gestire login/logout e stato di autenticazione
 
+  // Teniamo traccia del signal utenteLoggato
+  isLoggedIn = this.authService.utenteLoggato
+
   // Serve per gestire il menu dropdown di navigazione ("Gestione")
   menuGestioneAperto = signal(false);
 
@@ -99,10 +102,6 @@ export class App implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  // Verifica se c'è un utente attualmente loggato (Falegname o Cliente non importa)
-  isLoggedIn(): boolean {
-    return this.authService.getUtenteLoggato() !== null;
-  }
 
   // Verifica se è loggato ed è un Cliente
   isCliente(): boolean {

@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
 /**
@@ -10,6 +10,11 @@ import {HttpClient} from '@angular/common/http';
   providedIn: 'root'
 })
 export class Auth {
+
+  // Signal che tiene traccia se l'utente è loggato o meno
+  // con !! trasformiamo il risultato in un booleano (true se c'è un utente, false se null)
+  utenteLoggato = signal<boolean>(!!this.getUtenteLoggato());
+
   // Client HTTP per effettuare le richieste REST verso il backend Spring Boot
   // Una richiesta REST è una richiesta HTTP che invia dati al server per ottenere risultati.
   // REST sta per Representational State Transfer, che significa "Trasferimento di stato rappresentativo".
@@ -55,6 +60,7 @@ export class Auth {
    */
   setUtenteLoggato(utente: any) {
     localStorage.setItem('utente', JSON.stringify(utente));
+    this.utenteLoggato.set(true); // Aggiorna il signal utenteLoggato
   }
 
   /**
@@ -73,6 +79,8 @@ export class Auth {
    */
   logout() {
     localStorage.removeItem('utente');
+
+    this.utenteLoggato.set(false); // Aggiorna il signal utenteLoggato
 
     // Ricarica la pagina e porta l'utente al login
     window.location.href = '/login';
