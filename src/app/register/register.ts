@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 // Moduli per i Reactive Forms (form gestiti lato codice)
-import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
 import {Auth} from '../auth/auth';
 import Swal from 'sweetalert2';
@@ -24,22 +24,34 @@ export class Register {
 
   // Definizione del form e delle regole (Validatori)
   registerForm = this.fb.group({
-    // Il nome parte vuoto ed è semplicemente obbligatorio
-    nome: ['', Validators.required],
-    // L'email è obbligatoria e deve rispettare il formato standard (es. testo@dominio.it)
-    email: ['', [Validators.required, Validators.email]],
-    // La password è obbligatoria e deve avere una lunghezza minima di sicurezza (6 caratteri)
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    // Il ruolo dell'utente. Di dafault settato su "FALEGNAME"
-    ruolo: ['FALEGNAME', Validators.required]
-  });
-
+      // Il nome parte vuoto ed è semplicemente obbligatorio
+      nome: ['', Validators.required],
+      // L'email è obbligatoria e deve rispettare il formato standard (es. testo@dominio.it)
+      email: ['', [Validators.required, Validators.email]],
+      // La password è obbligatoria e deve avere una lunghezza minima di sicurezza (6 caratteri)
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      // Conferma password
+      confermaPassword: ['', Validators.required],
+      // Il ruolo dell'utente. Di dafault settato su "FALEGNAME"
+      ruolo: ['FALEGNAME', Validators.required]
+    },
+    {validators: this.passwordUgualiValidatore});
   // Strumenti per la navigazione e le chiamate API
   private router = inject(Router);
   private authService = inject(Auth);
-
   // Il ChangeDetectorRef serve per rilevare le modifiche e aggiornare l'interfaccia'
   private cdr = inject(ChangeDetectorRef);
+
+  passwordUgualiValidatore(control: AbstractControl): ValidationErrors | null {
+    const password = control.get('password')?.value;
+    const conferma = control.get('confermaPassword')?.value;
+
+    // Se entrambi i campi hanno testo, ma sono diversi, scatta l'errore "passwordMismatch"
+    if (password && conferma && password !== conferma) {
+      return {passwordMismatch: true};
+    }
+    return null;
+  }
 
   /**
    * Metodo richiamato quando l'utente preme "Registrati"

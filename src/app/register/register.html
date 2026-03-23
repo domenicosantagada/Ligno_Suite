@@ -114,7 +114,7 @@
               }
             </div>
 
-            <div class="mb-4">
+            <div class="mb-3">
               <label class="form-label text-muted small fw-bold">Password</label>
               <input class="form-control bg-light border-0"
                      formControlName="password"
@@ -122,6 +122,18 @@
                      type="password">
               @if (registerForm.get('password')?.hasError('minlength') && registerForm.get('password')?.touched) {
                 <small class="text-danger mt-1 d-block">La password deve essere di almeno 6 caratteri</small>
+              }
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label text-muted small fw-bold">Conferma Password</label>
+              <input class="form-control bg-light border-0"
+                     formControlName="confermaPassword"
+                     placeholder="Ripeti la password"
+                     type="password">
+
+              @if (registerForm.hasError('passwordMismatch') && registerForm.get('confermaPassword')?.touched) {
+                <small class="text-danger mt-1 d-block">Le password non corrispondono</small>
               }
             </div>
 
